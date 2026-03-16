@@ -45,71 +45,135 @@
         #app-container { display: none; height: 100vh; width: 100%; flex-direction: row; }
 
         .left-panel {
-            flex: 0 0 40%;
-            background: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)), url('https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?auto=format&fit=crop&q=80&w=2000');
+            flex: 0 0 45%;
+            background: linear-gradient(135deg, rgba(0, 10, 31, 0.7), rgba(0, 50, 150, 0.4)), url('it_bg.png');
             background-size: cover; background-position: center;
+            border-right: 1px solid rgba(255,255,255,0.1);
         }
 
         .right-panel {
             flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center;
-            background: white; position: relative; padding: 2rem;
+            background: #ffffff; position: relative; padding: 2rem;
+            box-shadow: -10px 0 30px rgba(0,0,0,0.05);
         }
 
         /* Company Selection */
-        .selection-area { text-align: center; width: 100%; max-width: 700px; }
-        .company-cards { display: flex; flex-wrap: wrap; justify-content: center; gap: 1.5rem; margin-top: 2rem; }
+        .selection-area { text-align: center; width: 100%; max-width: 800px; }
+        .company-cards { display: flex; flex-wrap: wrap; justify-content: center; gap: 2rem; margin-top: 3rem; }
         .card {
-            background: white; border: 1px solid var(--border); border-radius: 15px;
-            padding: 2rem; width: 220px; cursor: pointer; transition: 0.3s;
-            display: flex; flex-direction: column; align-items: center; gap: 1rem;
+            background: #fff; border: 1px solid var(--border); border-radius: 20px;
+            padding: 2.5rem; width: 240px; cursor: pointer; transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            display: flex; flex-direction: column; align-items: center; gap: 1.5rem;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.02);
         }
-        .card:hover { transform: translateY(-10px); border-color: var(--primary); box-shadow: var(--shadow); }
-        .card.highlight { border: 3px solid var(--primary); box-shadow: 0 0 30px rgba(0, 102, 255, 0.4); animation: pulse 1.5s infinite; }
-        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.05); } 100% { transform: scale(1); } }
+        .card:hover { transform: translateY(-15px); border-color: var(--primary); box-shadow: 0 20px 40px rgba(0, 102, 255, 0.15); }
+        .card.highlight { 
+            border: 3px solid var(--primary); 
+            box-shadow: 0 0 40px rgba(0, 102, 255, 0.3); 
+            animation: cardGlow 2s infinite;
+        }
+        @keyframes cardGlow { 
+            0%, 100% { transform: scale(1); box-shadow: 0 0 40px rgba(0, 102, 255, 0.3); } 
+            50% { transform: scale(1.05); box-shadow: 0 0 60px rgba(0, 102, 255, 0.5); } 
+        }
 
-        /* Interactive Robot */
-        .robot-container {
-            position: fixed; bottom: 30px; right: 30px; width: 120px; height: 120px;
-            cursor: pointer; transition: 0.3s; z-index: 500;
+        /* Interactive 3D Robot */
+        .robot-section {
+            position: fixed; bottom: 30px; right: 30px; z-index: 500;
+            perspective: 1000px;
         }
-        .robot-container:hover { transform: scale(1.1) rotate(5deg); }
-        .robot-container img { width: 100%; height: 100%; object-fit: contain; filter: drop-shadow(0 10px 15px rgba(0,0,0,0.2)); }
+        .robot-container {
+            width: 140px; height: 140px; cursor: pointer;
+            transition: 0.5s; transform-style: preserve-3d;
+            animation: robotFloat 4s ease-in-out infinite;
+        }
+        @keyframes robotFloat {
+            0%, 100% { transform: translateY(0) rotateX(0deg) rotateY(0deg); }
+            50% { transform: translateY(-15px) rotateX(5deg) rotateY(10deg); }
+        }
+        .robot-container:hover { transform: scale(1.1); }
+        .robot-container img { 
+            width: 100%; height: 100%; object-fit: contain; 
+            filter: drop-shadow(0 20px 30px rgba(0,0,0,0.3));
+        }
 
         .robot-bubble {
-            position: absolute; bottom: 130px; right: 0; width: 300px; background: white;
-            border-radius: 20px; box-shadow: var(--shadow); padding: 1.5rem;
-            display: none; transform-origin: bottom right; animation: popIn 0.3s ease-out;
-            border: 1px solid var(--border);
+            position: absolute; bottom: 160px; right: 0; width: 320px; background: rgba(255,255,255,0.98);
+            border-radius: 24px; box-shadow: 0 20px 50px rgba(0,0,0,0.15); padding: 1.8rem;
+            display: none; transform-origin: bottom right; animation: popIn 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            border: 1px solid rgba(0,102,255,0.1);
+            backdrop-filter: blur(10px);
         }
-        @keyframes popIn { from { transform: scale(0); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+        @keyframes popIn { from { transform: scale(0) translateY(100px); opacity: 0; } to { transform: scale(1) translateY(0); opacity: 1; } }
 
-        .bubble-header { display: flex; align-items: center; gap: 10px; margin-bottom: 15px; color: var(--primary); font-weight: 600; }
-        .bubble-input { display: flex; gap: 10px; }
-        .bubble-input input { flex: 1; border: 1px solid var(--border); border-radius: 10px; padding: 0.5rem 0.8rem; outline: none; }
-        .bubble-input button { background: var(--primary); border: none; padding: 0.5rem 1rem; border-radius: 10px; color: white; cursor: pointer; }
+        .bubble-header { display: flex; align-items: center; gap: 12px; margin-bottom: 18px; color: var(--primary); font-weight: 600; font-size: 1.1rem; }
+        .bubble-input { display: flex; gap: 10px; background: #f0f4f8; padding: 5px; border-radius: 12px; }
+        .bubble-input input { flex: 1; border: none; background: transparent; padding: 0.8rem; outline: none; font-size: 0.9rem; }
+        .bubble-input button { background: var(--primary); border: none; padding: 0 1.2rem; border-radius: 10px; color: white; cursor: pointer; transition: 0.3s; }
+        .bubble-input button:hover { background: #0052cc; }
 
-        /* Admin Section */
+        /* Knowledge Corner (Corner button) */
+        .knowledge-corner {
+            position: fixed; top: 30px; right: 30px; z-index: 1000;
+        }
+        .knowledge-btn {
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            color: white; width: 60px; height: 60px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.5rem; cursor: pointer; box-shadow: 0 10px 20px rgba(0, 102, 255, 0.3);
+            transition: 0.3s; border: 2px solid rgba(255,255,255,0.2);
+        }
+        .knowledge-btn:hover { transform: rotate(90deg) scale(1.1); }
+        .knowledge-label {
+            position: absolute; right: 70px; top: 15px; background: var(--text-dark);
+            color: white; padding: 5px 15px; border-radius: 20px; font-size: 0.8rem;
+            white-space: nowrap; opacity: 0; transition: 0.3s; pointer-events: none;
+        }
+        .knowledge-corner:hover .knowledge-label { opacity: 1; right: 80px; }
+
+        /* Admin Section Overlay */
         #admin-panel {
-            position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 2000;
+            position: fixed; inset: 0; background: rgba(0,10,31,0.85); z-index: 2000;
             display: none; align-items: center; justify-content: center;
+            backdrop-filter: blur(8px);
         }
-        .admin-box { background: white; padding: 3rem; border-radius: 20px; width: 450px; text-align: center; position: relative; }
-        .close-btn { position: absolute; top: 20px; right: 20px; cursor: pointer; font-size: 1.5rem; }
+        .admin-box { 
+            background: white; padding: 3.5rem; border-radius: 30px; width: 500px; 
+            text-align: center; position: relative;
+            box-shadow: 0 30px 60px rgba(0,0,0,0.5);
+        }
+        .admin-box h2 { color: var(--text-dark); margin-bottom: 1.5rem; font-size: 1.8rem; }
+        .close-btn { position: absolute; top: 25px; right: 25px; cursor: pointer; font-size: 1.5rem; color: #ccc; transition: 0.3s; }
+        .close-btn:hover { color: var(--primary); transform: rotate(90deg); }
 
-        .admin-trigger { position: absolute; bottom: 20px; left: 20px; font-size: 0.8rem; color: #999; cursor: pointer; text-decoration: underline; }
+        .admin-trigger { position: absolute; bottom: 20px; left: 20px; font-size: 0.8rem; color: #999; cursor: pointer; text-decoration: underline; opacity: 0.5; }
+        .admin-trigger:hover { opacity: 1; }
+
+        #password-gate { margin-bottom: 2rem; }
+        #password-gate input { 
+            width: 100%; padding: 1rem; border: 1px solid var(--border); 
+            border-radius: 12px; text-align: center; font-size: 1.1rem; letter-spacing: 5px;
+        }
 
     </style>
 </head>
 <body>
 
+    <!-- Knowledge Upload Corner -->
+    <div class="knowledge-corner">
+        <div class="knowledge-label">Subir Manual de Conocimiento</div>
+        <div class="knowledge-btn" onclick="openAdmin()">📄</div>
+    </div>
+
     <!-- Login -->
     <div id="login-screen">
         <div class="login-card">
-            <h2 style="margin-bottom: 2rem; color: #1a1a1a;">EuroSupport | Login</h2>
+            <h2 style="margin-bottom: 0.5rem; color: #1a1a1a;">EuroSupport</h2>
+            <p style="color: #888; margin-bottom: 2.5rem;">Gestión IT de Próxima Generación</p>
             <input type="text" id="username" placeholder="Usuario">
             <input type="password" id="password" placeholder="Contraseña">
-            <button onclick="doLogin()">Entrar</button>
-            <p style="margin-top: 1rem; font-size: 0.8rem; color: #999;">Usa admin / euro123 para el demo</p>
+            <button onclick="doLogin()">Iniciar Sesión</button>
+            <p style="margin-top: 1.5rem; font-size: 0.8rem; color: #bbb;">admin / euro123</p>
         </div>
     </div>
 
@@ -118,45 +182,47 @@
         <div class="left-panel"></div>
         <div class="right-panel">
             <div class="selection-area">
-                <h1 style="font-size: 2.5rem; margin-bottom: 0.5rem;">EuroSupport</h1>
-                <p style="color: #666; margin-bottom: 3rem;">Asistente de Ticket e Inicio de Sesión</p>
+                <h1 style="font-size: 3rem; margin-bottom: 0.8rem; letter-spacing: -1px;">Centros de Soporte</h1>
+                <p style="color: #777; font-size: 1.1rem; margin-bottom: 4rem;">Selecciona el área para gestionar tu requerimiento</p>
 
                 <div class="company-cards">
                     <div class="card" id="card-Euroconnect">
-                        <img src="https://cdn-icons-png.flaticon.com/512/2891/2891415.png" height="50">
-                        <span>Euroconnect</span>
+                        <img src="https://cdn-icons-png.flaticon.com/512/2891/2891415.png" height="60">
+                        <span style="font-weight: 600; font-size: 1.2rem;">Euroconnect</span>
                     </div>
                     <div class="card" id="card-TI-Euromotors">
-                        <img src="https://cdn-icons-png.flaticon.com/512/3202/3202926.png" height="50">
-                        <span>TI Euromotors</span>
+                        <img src="https://cdn-icons-png.flaticon.com/512/3202/3202926.png" height="60">
+                        <span style="font-weight: 600; font-size: 1.2rem;">TI Euromotors</span>
                     </div>
                     <div class="card" id="card-Mesa-de-Ayuda-SIS">
-                        <img src="https://cdn-icons-png.flaticon.com/512/1063/1063376.png" height="50">
-                        <span>Mesa de Ayuda SIS</span>
+                        <img src="https://cdn-icons-png.flaticon.com/512/1063/1063376.png" height="60">
+                        <span style="font-weight: 600; font-size: 1.2rem;">Mesa de Ayuda SIS</span>
                     </div>
                 </div>
 
-                <div style="margin-top: 4rem;">
-                    <button style="display: flex; align-items: center; gap: 10px; margin: 0 auto; padding: 0.8rem 2rem; border: 1px solid #ddd; background: white; border-radius: 8px; cursor: pointer;">
-                        <img src="https://www.gstatic.com/images/branding/product/1x/gsa_512dp.png" width="20">
-                        Sign in with Google
+                <div style="margin-top: 5rem;">
+                    <button style="display: flex; align-items: center; gap: 12px; margin: 0 auto; padding: 1rem 2.5rem; border: 1px solid #eee; background: white; border-radius: 15px; cursor: pointer; box-shadow: 0 5px 15px rgba(0,0,0,0.05); font-weight: 500;">
+                        <img src="https://www.gstatic.com/images/branding/product/1x/gsa_512dp.png" width="22">
+                        Acceder con Google Workspace
                     </button>
                 </div>
             </div>
 
-            <div class="admin-trigger" onclick="openAdmin()">Panel de Administrador</div>
+            <div class="admin-trigger" onclick="openAdmin()">Acceso Manual de Conocimiento</div>
         </div>
     </div>
 
     <!-- Interactive Robot -->
-    <div id="robot-bot" class="robot-container" onclick="toggleBubble()">
-        <img src="robot_avatar_eurosupport_1773686927547.png" alt="Robot Assistant">
+    <div class="robot-section">
+        <div id="robot-bot" class="robot-container" onclick="toggleBubble()">
+            <img src="robot_3d.png" alt="Robot Assistant">
+        </div>
         <div id="bubble" class="robot-bubble" onclick="event.stopPropagation()">
-            <div class="bubble-header">🤖 Hola, ¿cómo te ayudo?</div>
-            <div id="bot-reply" style="font-size: 0.9rem; margin-bottom: 20px; color: #555;">Dime qué problema tienes y te indicaré dónde crear tu ticket.</div>
+            <div class="bubble-header">🤖 Hola, ¿cómo te ayudo hoy?</div>
+            <div id="bot-reply" style="font-size: 0.95rem; margin-bottom: 22px; color: #444; line-height: 1.5;">Soy tu asistente inteligente. ¿Tienes algún problema técnico o quieres crear un ticket?</div>
             <div class="bubble-input">
-                <input type="text" id="bot-query" placeholder="Escribe tu consulta..." onkeypress="if(event.key==='Enter') sendBotQuery()">
-                <button onclick="sendBotQuery()">Enviar</button>
+                <input type="text" id="bot-query" placeholder="Escribe tu consulta aquí..." onkeypress="if(event.key==='Enter') sendBotQuery()">
+                <button onclick="sendBotQuery()">➤</button>
             </div>
         </div>
     </div>
@@ -165,17 +231,26 @@
     <div id="admin-panel">
         <div class="admin-box">
             <span class="close-btn" onclick="closeAdmin()">✕</span>
-            <h2 style="margin-bottom: 1rem;">Base de Conocimiento Global</h2>
-            <p style="color: #666; font-size: 0.9rem; margin-bottom: 2rem;">Sube el archivo Word (.docx) que servirá para que el bot ayude a todos los usuarios.</p>
+            <h2>Base de Conocimiento</h2>
             
-            <div style="border: 2px dashed #ddd; padding: 3rem; border-radius: 15px; cursor: pointer;" onclick="document.getElementById('file-input').click()">
-                📄<br>Haz clic para seleccionar el archivo
-                <input type="file" id="file-input" accept=".docx" style="display:none" onchange="handleFile(this)">
-                <div id="file-name" style="margin-top: 10px; font-size: 0.8rem; color: var(--primary);"></div>
+            <div id="password-gate">
+                <p style="color: #666; margin-bottom: 1.5rem;">Ingresa la clave maestra para subir archivos</p>
+                <input type="password" id="admin-password" placeholder="••••••••">
             </div>
 
-            <button onclick="uploadWord()" style="margin-top: 2rem; width: 100%; padding: 1rem; background: var(--primary); color: white; border: none; border-radius: 10px; font-weight: 600; cursor: pointer;">
-                Subir y Actualizar Conocimiento
+            <p style="color: #888; font-size: 0.85rem; margin-bottom: 2rem;">El documento Word se replicará en tiempo real para todos los usuarios del sistema.</p>
+            
+            <div style="border: 2px dashed #0066ff33; padding: 3rem; border-radius: 20px; cursor: pointer; background: #f8fbff; transition: 0.3s;" 
+                 onmouseover="this.style.borderColor='#0066ff'" onmouseout="this.style.borderColor='#0066ff33'"
+                 onclick="document.getElementById('file-input').click()">
+                <div style="font-size: 2.5rem; margin-bottom: 10px;">📄</div>
+                <div style="font-weight: 500; color: #444;">Seleccionar archivo .docx</div>
+                <input type="file" id="file-input" accept=".docx" style="display:none" onchange="handleFile(this)">
+                <div id="file-name" style="margin-top: 15px; font-size: 0.85rem; color: var(--primary); font-weight: 600;"></div>
+            </div>
+
+            <button onclick="uploadWord()" style="margin-top: 2.5rem; width: 100%; padding: 1.2rem; background: var(--primary); color: white; border: none; border-radius: 15px; font-weight: 600; cursor: pointer; box-shadow: 0 10px 20px rgba(0,102,255,0.25);">
+                Sincronizar Conocimiento Global
             </button>
         </div>
     </div>
@@ -202,12 +277,17 @@
                 } else {
                     alert(data.error);
                 }
-            } catch (e) { alert('Error de conexión'); }
+            } catch (e) { alert('Error de conexión con el servidor.'); }
         }
 
         function toggleBubble() {
             const b = document.getElementById('bubble');
-            b.style.display = b.style.display === 'block' ? 'none' : 'block';
+            const show = b.style.display !== 'block';
+            b.style.display = show ? 'block' : 'none';
+            if (show) {
+                document.getElementById('bot-reply').innerText = '¿Qué problema tienes hoy? Cuéntame y te ayudaré a crear un ticket.';
+                document.getElementById('bot-query').focus();
+            }
         }
 
         async function sendBotQuery() {
@@ -216,7 +296,8 @@
             if (!q) return;
 
             input.value = '';
-            document.getElementById('bot-reply').innerText = 'Pensando...';
+            const replyEl = document.getElementById('bot-reply');
+            replyEl.innerHTML = '<span style="color: #888">Analizando requerimiento...</span>';
 
             try {
                 const res = await fetch(`${API_URL}/chat`, {
@@ -226,13 +307,16 @@
                 });
                 const data = await res.json();
                 
-                document.getElementById('bot-reply').innerHTML = data.reply.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+                // Animación de escritura simple
+                replyEl.innerHTML = data.reply.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
                 
                 if (data.suggestedCompany) {
                     highlightCard(data.suggestedCompany);
+                } else {
+                    document.querySelectorAll('.card').forEach(c => c.classList.remove('highlight'));
                 }
             } catch (e) {
-                document.getElementById('bot-reply').innerText = 'Hubo un error al consultar.';
+                replyEl.innerText = 'Error de comunicación del bot.';
             }
         }
 
@@ -246,7 +330,10 @@
             }
         }
 
-        function openAdmin() { document.getElementById('admin-panel').style.display = 'flex'; }
+        function openAdmin() { 
+            document.getElementById('admin-panel').style.display = 'flex'; 
+            document.getElementById('admin-password').focus();
+        }
         function closeAdmin() { document.getElementById('admin-panel').style.display = 'none'; }
 
         let fileToUpload = null;
@@ -258,19 +345,28 @@
         }
 
         async function uploadWord() {
-            if (!fileToUpload) return alert('Selecciona un archivo');
+            const pass = document.getElementById('admin-password').value;
+            if (!pass) return alert('Se requiere la contraseña maestra.');
+            if (!fileToUpload) return alert('Por favor, selecciona un archivo .docx');
+            
             const fd = new FormData();
             fd.append('document', fileToUpload);
+            fd.append('password', pass);
 
             try {
                 const res = await fetch(`${API_URL}/upload`, { method: 'POST', body: fd });
                 const data = await res.json();
                 if (data.message) {
-                    alert('Conocimiento cargado para todos!');
+                    alert('¡Base de conocimiento actualizada para todos los terminales!');
+                    document.getElementById('admin-password').value = '';
                     closeAdmin();
+                } else {
+                    alert(data.error || 'Fallo en la carga.');
                 }
-            } catch (e) { alert('Error al subir'); }
+            } catch (e) { alert('Error al procesar el archivo.'); }
         }
     </script>
+</body>
+</html>
 </body>
 </html>
