@@ -174,6 +174,50 @@
             background: var(--glass);
             border: 1px solid var(--glass-border);
             border-bottom-left-radius: 4px;
+            display: flex;
+            flex-direction: column;
+            gap: 0.8rem;
+        }
+
+        .bot-avatar {
+            width: 40px;
+            height: 40px;
+            background: var(--primary);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.2rem;
+            margin-bottom: 0.5rem;
+            border: 2px solid var(--accent);
+            box-shadow: 0 0 10px var(--primary);
+        }
+
+        .options-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.8rem;
+            margin-top: 0.5rem;
+        }
+
+        .option-btn {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 0.5rem 1rem;
+            color: var(--text);
+            cursor: pointer;
+            font-size: 0.85rem;
+            transition: 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .option-btn:hover {
+            background: var(--primary);
+            border-color: var(--accent);
+            transform: translateY(-2px);
         }
 
         .message.user {
@@ -333,7 +377,13 @@
             </div>
             <div class="chat-messages" id="chat-messages">
                 <div class="message bot">
-                    ¡Hola! Soy tu asistente de EuroSupport. Indícame qué problema tienes y te guiaré para crear tu ticket correctamente.
+                    <div class="bot-avatar">🤖</div>
+                    <div>¡Hola! Soy tu asistente de **EuroSupport**. Selecciona una de las siguientes opciones para guiarte mejor:</div>
+                    <div class="options-container">
+                        <button class="option-btn" onclick="selectOption('Euroconnect')">🏢 Euroconnect</button>
+                        <button class="option-btn" onclick="selectOption('TI Euromotors')">🚗 TI Euromotors</button>
+                        <button class="option-btn" onclick="selectOption('Mesa de Ayuda SIS')">🛠️ Mesa de Ayuda SIS</button>
+                    </div>
                 </div>
             </div>
             <div class="chat-input-area">
@@ -438,11 +488,41 @@
             }
         }
 
+        async function selectOption(option) {
+            addMessage(option, 'user');
+            
+            let reply = "";
+            if (option === 'Euroconnect') {
+                reply = "Has seleccionado **Euroconnect**. ¿En qué podemos ayudarte con los servicios de logística y transporte?";
+            } else if (option === 'TI Euromotors') {
+                reply = "Has seleccionado **TI Euromotors**. Por favor, indícanos tu problema técnico relacionado con automoción.";
+            } else if (option === 'Mesa de Ayuda SIS') {
+                reply = "Has seleccionado **Mesa de Ayuda SIS**. ¿Tienes algún problema con el sistema interno o reportes de usuario?";
+            }
+            
+            setTimeout(() => {
+                addMessage(reply, 'bot');
+            }, 500);
+        }
+
         function addMessage(text, sender) {
             const container = document.getElementById('chat-messages');
             const msgDiv = document.createElement('div');
             msgDiv.className = `message ${sender}`;
-            msgDiv.innerText = text;
+            
+            if (sender === 'bot') {
+                const avatar = document.createElement('div');
+                avatar.className = 'bot-avatar';
+                avatar.innerText = '🤖';
+                msgDiv.appendChild(avatar);
+                
+                const textDiv = document.createElement('div');
+                textDiv.innerHTML = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+                msgDiv.appendChild(textDiv);
+            } else {
+                msgDiv.innerText = text;
+            }
+            
             container.appendChild(msgDiv);
             container.scrollTop = container.scrollHeight;
         }
