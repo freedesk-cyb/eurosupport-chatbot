@@ -106,13 +106,59 @@
         .bubble-input button { background: linear-gradient(135deg, var(--primary), #0052cc); border: none; padding: 0 1.5rem; border-radius: 12px; color: white; cursor: pointer; transition: 0.3s; font-size: 1.1rem; }
         .bubble-input button:hover { transform: scale(1.05); box-shadow: 0 5px 15px rgba(0,102,255,0.3); }
 
-        /* Dragging hint */
-        .robot-hint {
-            position: absolute; top: 20px; width: 100%; text-align: center;
-            font-size: 0.75rem; color: #aaa; text-transform: uppercase; letter-spacing: 2px;
-            opacity: 0; transition: 0.5s; pointer-events: none;
+        /* Knowledge Corner (Secured Terminal Button) */
+        .knowledge-corner {
+            position: fixed; top: 40px; right: 40px; z-index: 1000;
         }
-        .robot-container:hover .robot-hint { opacity: 1; }
+        .knowledge-btn {
+            background: #000;
+            color: #00f2ff; width: 65px; height: 65px; border-radius: 8px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.8rem; cursor: pointer; box-shadow: 0 0 20px rgba(0, 242, 255, 0.2);
+            transition: 0.4s; border: 1px solid rgba(0, 242, 255, 0.3);
+            position: relative; overflow: hidden;
+        }
+        .knowledge-btn::after {
+            content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(0, 242, 255, 0.1), transparent);
+            transform: rotate(45deg); animation: scanLine 3s infinite linear;
+        }
+        @keyframes scanLine { 0% { transform: translateY(-100%) rotate(45deg); } 100% { transform: translateY(100%) rotate(45deg); } }
+        .knowledge-btn:hover { transform: scale(1.1); box-shadow: 0 0 30px rgba(0, 242, 255, 0.5); border-color: #00f2ff; }
+        
+        .knowledge-label {
+            position: absolute; right: 80px; top: 18px; background: rgba(0,0,0,0.8);
+            color: #00f2ff; padding: 6px 18px; border-radius: 4px; font-size: 0.75rem;
+            white-space: nowrap; opacity: 0; transition: 0.3s; pointer-events: none;
+            border-right: 3px solid #00f2ff; text-transform: uppercase; letter-spacing: 1px;
+            backdrop-filter: blur(5px);
+        }
+        .knowledge-corner:hover .knowledge-label { opacity: 1; right: 90px; }
+
+        /* Admin Section Overlay (Secured Room) */
+        #admin-panel {
+            position: fixed; inset: 0; background: rgba(0,2,10,0.96); z-index: 2000;
+            display: none; align-items: center; justify-content: center;
+            backdrop-filter: blur(25px);
+        }
+        .admin-box { 
+            background: #02050a; padding: 4rem; border-radius: 4px; width: 550px; 
+            text-align: center; position: relative;
+            border: 1px solid rgba(0, 242, 255, 0.2);
+            box-shadow: 0 0 100px rgba(0, 242, 255, 0.1);
+        }
+        .admin-box h2 { color: #00f2ff; margin-bottom: 2rem; font-size: 2rem; font-weight: 300; letter-spacing: 4px; text-transform: uppercase; }
+        .close-btn { position: absolute; top: 25px; right: 25px; cursor: pointer; font-size: 1.5rem; color: #333; transition: 0.3s; }
+        .close-btn:hover { color: #00f2ff; transform: rotate(90deg); }
+
+        #password-gate { margin-bottom: 2rem; }
+        #password-gate input { 
+            width: 100%; padding: 1.5rem; border: 1px solid rgba(0, 242, 255, 0.3); 
+            border-radius: 0; background: rgba(0,0,0,0.5); color: #00f2ff;
+            text-align: center; font-size: 1.5rem; letter-spacing: 12px;
+            font-family: monospace; outline: none; transition: 0.3s;
+        }
+        #password-gate input:focus { border-color: #00f2ff; box-shadow: 0 0 30px rgba(0, 242, 255, 0.3); }
 
     </style>
 </head>
@@ -157,11 +203,11 @@
         </div>
     </div>
 
-    <!-- Interactive Hyper-Realistic Robot -->
+    <!-- Interactive Hyper-Realistic Character Robot -->
     <div class="robot-section">
         <div id="robot-bot" class="robot-container" onmousedown="startDrag(event)" onclick="handleBotClick(event)">
-            <div class="robot-hint">Arrastra para mover</div>
-            <img id="robot-img" src="robot_realistic.png" alt="Realistic 3D Robot Assistant">
+            <div class="robot-hint">Interacción 3D Habilitada</div>
+            <img id="robot-img" src="robot_character.png" alt="3D Robot Character">
         </div>
         <div id="bubble" class="robot-bubble" onclick="event.stopPropagation()">
             <div class="bubble-header">✨ Asistente de Comando</div>
@@ -186,17 +232,17 @@
 
             <p style="color: #999; font-size: 0.8rem; margin-bottom: 2rem;">Los cambios en el manual afectarán el comportamiento del bot para toda la red.</p>
             
-            <div style="border: 2px dashed #0066ff22; padding: 3.5rem; border-radius: 24px; cursor: pointer; background: #fbfdff; transition: 0.3s;" 
-                 onmouseover="this.style.borderColor='#0066ff'; this.style.background='#f0f7ff'" onmouseout="this.style.borderColor='#0066ff22'; this.style.background='#fbfdff'"
+            <div style="border: 1px solid rgba(0, 242, 255, 0.1); padding: 4rem; cursor: pointer; background: rgba(0, 242, 255, 0.02); transition: 0.3s; position: relative;" 
+                 onmouseover="this.style.background='rgba(0, 242, 255, 0.05)'; this.style.borderColor='rgba(0, 242, 255, 0.5)'" onmouseout="this.style.background='rgba(0, 242, 255, 0.02)'; this.style.borderColor='rgba(0, 242, 255, 0.1)'"
                  onclick="document.getElementById('file-input').click()">
-                <div style="font-size: 3rem; margin-bottom: 15px;">📡</div>
-                <div style="font-weight: 600; color: #1a1a1a;">Vincular Base Docx</div>
+                <div style="font-size: 3.5rem; margin-bottom: 20px; filter: drop-shadow(0 0 10px #00f2ff);">⚡</div>
+                <div style="font-weight: 300; color: #00f2ff; letter-spacing: 2px;">VINCULACIÓN DE NÚCLEO (.docx)</div>
                 <input type="file" id="file-input" accept=".docx" style="display:none" onchange="handleFile(this)">
-                <div id="file-name" style="margin-top: 20px; font-size: 0.9rem; color: var(--primary); font-weight: 700;"></div>
+                <div id="file-name" style="margin-top: 25px; font-size: 1rem; color: #fff; font-family: monospace;"></div>
             </div>
 
-            <button onclick="uploadWord()" style="margin-top: 3rem; width: 100%; padding: 1.4rem; background: linear-gradient(135deg, var(--primary), #0052cc); color: white; border: none; border-radius: 18px; font-weight: 700; cursor: pointer; box-shadow: 0 15px 30px rgba(0,102,255,0.3); text-transform: uppercase; letter-spacing: 1px;">
-                Actualizar Conocimiento Global
+            <button onclick="uploadWord()" style="margin-top: 3rem; width: 100%; padding: 1.5rem; background: #00f2ff; color: #000; border: none; border-radius: 0; font-weight: 800; cursor: pointer; box-shadow: 0 0 30px rgba(0, 242, 255, 0.3); text-transform: uppercase; letter-spacing: 3px; transition: 0.3s;">
+                Ejecutar Sincronización
             </button>
         </div>
     </div>
