@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EuroSupport | Central de Ayuda</title>
+    <title>EuroSupport | Central de Ayuda Inteligente</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600&display=swap" rel="stylesheet">
@@ -11,439 +11,265 @@
         :root {
             --primary: #0066ff;
             --accent: #00f2ff;
-            --bg-light: #ffffff;
-            --text-dark: #333333;
-            --text-dim: #666666;
+            --bg-light: #f8f9fa;
+            --text-dark: #1a1a1a;
             --border: #e0e0e0;
-            --highlight: rgba(0, 102, 255, 0.4);
+            --shadow: 0 10px 30px rgba(0,0,0,0.1);
         }
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Outfit', sans-serif;
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Outfit', sans-serif; }
+        body { height: 100vh; background: var(--bg-light); overflow: hidden; }
+
+        /* Login Screen */
+        #login-screen {
+            position: fixed; inset: 0; background: white; z-index: 1000;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
         }
 
-        body {
-            height: 100vh;
-            display: flex;
-            overflow: hidden;
-            background: #f8f9fa;
+        .login-card {
+            width: 100%; max-width: 400px; padding: 3rem; background: white;
+            border-radius: 20px; box-shadow: var(--shadow); text-align: center;
         }
 
-        /* Left Panel - Image */
+        .login-card input {
+            width: 100%; padding: 1rem; margin-bottom: 1rem; 
+            border: 1px solid var(--border); border-radius: 8px; outline: none;
+        }
+
+        .login-card button {
+            width: 100%; padding: 1rem; background: var(--primary); color: white;
+            border: none; border-radius: 8px; font-weight: 600; cursor: pointer;
+        }
+
+        /* App Layout (Split Screen) */
+        #app-container { display: none; height: 100vh; width: 100%; flex-direction: row; }
+
         .left-panel {
-            width: 40%;
-            height: 100%;
-            background: linear-gradient(rgba(5, 10, 21, 0.4), rgba(5, 10, 21, 0.4)), 
-                        url('https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?auto=format&fit=crop&q=80&w=2000');
-            background-size: cover;
-            background-position: center;
-            position: relative;
+            flex: 0 0 40%;
+            background: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)), url('https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?auto=format&fit=crop&q=80&w=2000');
+            background-size: cover; background-position: center;
         }
 
-        /* Right Panel - Content */
         .right-panel {
-            width: 60%;
-            display: flex;
-            position: relative;
+            flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center;
+            background: white; position: relative; padding: 2rem;
         }
 
-        .main-content {
-            flex: 1;
-            padding: 4rem 2rem;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            background: white;
-        }
-
-        .logo-area {
-            text-align: center;
-            margin-bottom: 3rem;
-        }
-
-        .logo-text {
-            font-size: 2.5rem;
-            font-weight: 600;
-            color: #1a1a1a;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .logo-text span {
-            font-weight: 300;
-            color: #555;
-        }
-
-        .help-icon {
-            font-size: 2rem;
-            color: #1a1a1a;
-            border: 2px solid #1a1a1a;
-            border-radius: 50%;
-            width: 40px;
-            height: 40px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-left: 0.5rem;
-        }
-
-        .selection-prompt {
-            color: var(--primary);
-            font-size: 1rem;
-            margin-bottom: 2rem;
-        }
-
-        .company-cards {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            gap: 1.5rem;
-            max-width: 600px;
-        }
-
+        /* Company Selection */
+        .selection-area { text-align: center; width: 100%; max-width: 700px; }
+        .company-cards { display: flex; flex-wrap: wrap; justify-content: center; gap: 1.5rem; margin-top: 2rem; }
         .card {
-            background: white;
+            background: white; border: 1px solid var(--border); border-radius: 15px;
+            padding: 2rem; width: 220px; cursor: pointer; transition: 0.3s;
+            display: flex; flex-direction: column; align-items: center; gap: 1rem;
+        }
+        .card:hover { transform: translateY(-10px); border-color: var(--primary); box-shadow: var(--shadow); }
+        .card.highlight { border: 3px solid var(--primary); box-shadow: 0 0 30px rgba(0, 102, 255, 0.4); animation: pulse 1.5s infinite; }
+        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.05); } 100% { transform: scale(1); } }
+
+        /* Interactive Robot */
+        .robot-container {
+            position: fixed; bottom: 30px; right: 30px; width: 120px; height: 120px;
+            cursor: pointer; transition: 0.3s; z-index: 500;
+        }
+        .robot-container:hover { transform: scale(1.1) rotate(5deg); }
+        .robot-container img { width: 100%; height: 100%; object-fit: contain; filter: drop-shadow(0 10px 15px rgba(0,0,0,0.2)); }
+
+        .robot-bubble {
+            position: absolute; bottom: 130px; right: 0; width: 300px; background: white;
+            border-radius: 20px; box-shadow: var(--shadow); padding: 1.5rem;
+            display: none; transform-origin: bottom right; animation: popIn 0.3s ease-out;
             border: 1px solid var(--border);
-            border-radius: 12px;
-            padding: 1.5rem;
-            width: 250px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 1rem;
-            cursor: pointer;
-            transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            text-decoration: none;
-            color: inherit;
         }
+        @keyframes popIn { from { transform: scale(0); opacity: 0; } to { transform: scale(1); opacity: 1; } }
 
-        .card:hover {
-            transform: translateY(-5px);
-            border-color: var(--primary);
-            box-shadow: 0 10px 20px rgba(0,0,0,0.05);
-        }
+        .bubble-header { display: flex; align-items: center; gap: 10px; margin-bottom: 15px; color: var(--primary); font-weight: 600; }
+        .bubble-input { display: flex; gap: 10px; }
+        .bubble-input input { flex: 1; border: 1px solid var(--border); border-radius: 10px; padding: 0.5rem 0.8rem; outline: none; }
+        .bubble-input button { background: var(--primary); border: none; padding: 0.5rem 1rem; border-radius: 10px; color: white; cursor: pointer; }
 
-        .card.active {
-            border: 2px solid var(--primary);
-            box-shadow: 0 0 20px var(--highlight);
+        /* Admin Section */
+        #admin-panel {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 2000;
+            display: none; align-items: center; justify-content: center;
         }
+        .admin-box { background: white; padding: 3rem; border-radius: 20px; width: 450px; text-align: center; position: relative; }
+        .close-btn { position: absolute; top: 20px; right: 20px; cursor: pointer; font-size: 1.5rem; }
 
-        .card img {
-            height: 40px;
-            object-fit: contain;
-        }
+        .admin-trigger { position: absolute; bottom: 20px; left: 20px; font-size: 0.8rem; color: #999; cursor: pointer; text-decoration: underline; }
 
-        .card span {
-            font-weight: 600;
-            font-size: 1rem;
-            color: var(--primary);
-        }
-
-        .google-btn {
-            margin-top: 3rem;
-            display: flex;
-            align-items: center;
-            gap: 0.8rem;
-            padding: 0.8rem 2rem;
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            background: white;
-            cursor: pointer;
-            font-weight: 500;
-            transition: 0.3s;
-        }
-
-        .google-btn:hover {
-            background: #f1f1f1;
-        }
-
-        /* Chat Sidebar */
-        .chat-sidebar {
-            width: 350px;
-            height: 100%;
-            border-left: 1px solid var(--border);
-            background: #fafafa;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .chat-header {
-            padding: 1.5rem;
-            background: white;
-            border-bottom: 1px solid var(--border);
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-        }
-
-        .bot-avatar {
-            width: 40px;
-            height: 40px;
-            background: var(--primary);
-            border-radius: 50%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-size: 1.5rem;
-        }
-
-        .chat-messages {
-            flex: 1;
-            padding: 1rem;
-            overflow-y: auto;
-            display: flex;
-            flex-direction: column;
-            gap: 1rem;
-        }
-
-        .message {
-            max-width: 85%;
-            padding: 0.8rem 1rem;
-            border-radius: 12px;
-            font-size: 0.9rem;
-            line-height: 1.4;
-        }
-
-        .message.bot {
-            align-self: flex-start;
-            background: white;
-            border: 1px solid var(--border);
-            border-bottom-left-radius: 2px;
-        }
-
-        .message.user {
-            align-self: flex-end;
-            background: var(--primary);
-            color: white;
-            border-bottom-right-radius: 2px;
-        }
-
-        .chat-input {
-            padding: 1rem;
-            background: white;
-            border-top: 1px solid var(--border);
-            display: flex;
-            gap: 0.5rem;
-        }
-
-        .chat-input input {
-            flex: 1;
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            padding: 0.6rem 1rem;
-            outline: none;
-        }
-
-        .chat-input button {
-            background: var(--primary);
-            color: white;
-            border: none;
-            border-radius: 8px;
-            padding: 0 1rem;
-            cursor: pointer;
-        }
-
-        /* Admin Trigger */
-        .admin-trigger {
-            position: absolute;
-            bottom: 1rem;
-            left: 1rem;
-            font-size: 0.8rem;
-            color: #999;
-            cursor: pointer;
-            text-decoration: underline;
-        }
-
-        /* Modals */
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.5);
-            z-index: 1000;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .modal-content {
-            background: white;
-            padding: 2rem;
-            border-radius: 16px;
-            width: 400px;
-            text-align: center;
-        }
-
-        .upload-area {
-            border: 2px dashed var(--border);
-            padding: 2rem;
-            margin: 1.5rem 0;
-            border-radius: 12px;
-            cursor: pointer;
-        }
-
-        .upload-area:hover {
-            border-color: var(--primary);
-        }
     </style>
 </head>
 <body>
 
-    <div class="left-panel"></div>
-
-    <div class="right-panel">
-        <div class="main-content">
-            <div class="logo-area">
-                <div class="logo-text">Euro<span>Support</span> <div class="help-icon">?</div></div>
-            </div>
-
-            <p class="selection-prompt">Seleccione una empresa para iniciar sesión:</p>
-
-            <div class="company-cards">
-                <div class="card" id="card-Euroconnect">
-                    <img src="https://cdn-icons-png.flaticon.com/512/2891/2891415.png" alt="Euroconnect">
-                    <span>Euroconnect</span>
-                </div>
-                <div class="card" id="card-Euromotors">
-                    <img src="https://cdn-icons-png.flaticon.com/512/3202/3202926.png" alt="TI Euromotors">
-                    <span>TI Euromotors</span>
-                </div>
-                <div class="card" id="card-SIS">
-                    <img src="https://cdn-icons-png.flaticon.com/512/1063/1063376.png" alt="SIS">
-                    <span>Mesa de Ayuda SIS</span>
-                </div>
-            </div>
-
-            <button class="google-btn">
-                <img src="https://www.gstatic.com/images/branding/product/1x/gsa_512dp.png" width="20" alt="Google">
-                Sign in with Google
-            </button>
-
-            <div class="admin-trigger" onclick="toggleAdmin()">Panel Administrador</div>
+    <!-- Login -->
+    <div id="login-screen">
+        <div class="login-card">
+            <h2 style="margin-bottom: 2rem; color: #1a1a1a;">EuroSupport | Login</h2>
+            <input type="text" id="username" placeholder="Usuario">
+            <input type="password" id="password" placeholder="Contraseña">
+            <button onclick="doLogin()">Entrar</button>
+            <p style="margin-top: 1rem; font-size: 0.8rem; color: #999;">Usa admin / euro123 para el demo</p>
         </div>
+    </div>
 
-        <div class="chat-sidebar">
-            <div class="chat-header">
-                <div class="bot-avatar">🤖</div>
-                <div>
-                    <h3 style="font-size: 0.9rem;">Asistente Virtual</h3>
-                    <p style="font-size: 0.7rem; color: #44ff44;">● En línea</p>
+    <!-- App -->
+    <div id="app-container">
+        <div class="left-panel"></div>
+        <div class="right-panel">
+            <div class="selection-area">
+                <h1 style="font-size: 2.5rem; margin-bottom: 0.5rem;">EuroSupport</h1>
+                <p style="color: #666; margin-bottom: 3rem;">Asistente de Ticket e Inicio de Sesión</p>
+
+                <div class="company-cards">
+                    <div class="card" id="card-Euroconnect">
+                        <img src="https://cdn-icons-png.flaticon.com/512/2891/2891415.png" height="50">
+                        <span>Euroconnect</span>
+                    </div>
+                    <div class="card" id="card-TI-Euromotors">
+                        <img src="https://cdn-icons-png.flaticon.com/512/3202/3202926.png" height="50">
+                        <span>TI Euromotors</span>
+                    </div>
+                    <div class="card" id="card-Mesa-de-Ayuda-SIS">
+                        <img src="https://cdn-icons-png.flaticon.com/512/1063/1063376.png" height="50">
+                        <span>Mesa de Ayuda SIS</span>
+                    </div>
+                </div>
+
+                <div style="margin-top: 4rem;">
+                    <button style="display: flex; align-items: center; gap: 10px; margin: 0 auto; padding: 0.8rem 2rem; border: 1px solid #ddd; background: white; border-radius: 8px; cursor: pointer;">
+                        <img src="https://www.gstatic.com/images/branding/product/1x/gsa_512dp.png" width="20">
+                        Sign in with Google
+                    </button>
                 </div>
             </div>
-            <div class="chat-messages" id="chat-messages">
-                <div class="message bot">
-                    ¡Hola! Soy tu asistente de EuroSupport. ¿Tienes dudas sobre dónde ingresar? Pregúntame y te ayudaré a elegir.
-                </div>
-            </div>
-            <div class="chat-input">
-                <input type="text" id="user-input" placeholder="Pregunta algo..." onkeypress="if(event.key === 'Enter') sendMessage()">
-                <button onclick="sendMessage()">➤</button>
+
+            <div class="admin-trigger" onclick="openAdmin()">Panel de Administrador</div>
+        </div>
+    </div>
+
+    <!-- Interactive Robot -->
+    <div id="robot-bot" class="robot-container" onclick="toggleBubble()">
+        <img src="robot_avatar_eurosupport_1773686927547.png" alt="Robot Assistant">
+        <div id="bubble" class="robot-bubble" onclick="event.stopPropagation()">
+            <div class="bubble-header">🤖 Hola, ¿cómo te ayudo?</div>
+            <div id="bot-reply" style="font-size: 0.9rem; margin-bottom: 20px; color: #555;">Dime qué problema tienes y te indicaré dónde crear tu ticket.</div>
+            <div class="bubble-input">
+                <input type="text" id="bot-query" placeholder="Escribe tu consulta..." onkeypress="if(event.key==='Enter') sendBotQuery()">
+                <button onclick="sendBotQuery()">Enviar</button>
             </div>
         </div>
     </div>
 
-    <!-- Admin Modal -->
-    <div id="admin-modal" class="modal">
-        <div class="modal-content">
-            <h3>Base de Conocimientos</h3>
-            <p style="font-size: 0.8rem; color: #666;">Sube un archivo Word para entrenar al bot.</p>
-            <div class="upload-area" onclick="document.getElementById('file-input').click()">
-                📄<br>Haz clic para subir .docx
-                <input type="file" id="file-input" accept=".docx" style="display: none;" onchange="handleFileSelect(this)">
-                <div id="file-info" style="font-size: 0.7rem; margin-top: 0.5rem;"></div>
+    <!-- Admin Panel -->
+    <div id="admin-panel">
+        <div class="admin-box">
+            <span class="close-btn" onclick="closeAdmin()">✕</span>
+            <h2 style="margin-bottom: 1rem;">Base de Conocimiento Global</h2>
+            <p style="color: #666; font-size: 0.9rem; margin-bottom: 2rem;">Sube el archivo Word (.docx) que servirá para que el bot ayude a todos los usuarios.</p>
+            
+            <div style="border: 2px dashed #ddd; padding: 3rem; border-radius: 15px; cursor: pointer;" onclick="document.getElementById('file-input').click()">
+                📄<br>Haz clic para seleccionar el archivo
+                <input type="file" id="file-input" accept=".docx" style="display:none" onchange="handleFile(this)">
+                <div id="file-name" style="margin-top: 10px; font-size: 0.8rem; color: var(--primary);"></div>
             </div>
-            <button onclick="uploadDocument()" style="padding: 0.5rem 1rem; background: var(--primary); color: white; border: none; border-radius: 5px; cursor: pointer;">Subir</button>
-            <button onclick="toggleAdmin()" style="margin-left: 0.5rem; background: none; border: none; color: #999; cursor: pointer;">Cerrar</button>
+
+            <button onclick="uploadWord()" style="margin-top: 2rem; width: 100%; padding: 1rem; background: var(--primary); color: white; border: none; border-radius: 10px; font-weight: 600; cursor: pointer;">
+                Subir y Actualizar Conocimiento
+            </button>
         </div>
     </div>
 
     <script>
         const API_URL = '/api';
+        let loggedUser = null;
 
-        async function sendMessage() {
-            const input = document.getElementById('user-input');
-            const message = input.value.trim();
-            if (!message) return;
-
-            addMessage(message, 'user');
-            input.value = '';
+        async function doLogin() {
+            const u = document.getElementById('username').value;
+            const p = document.getElementById('password').value;
 
             try {
-                const response = await fetch(`${API_URL}/chat`, {
+                const res = await fetch(`${API_URL}/login`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ message })
+                    body: JSON.stringify({ username: u, password: p })
                 });
-                const data = await response.json();
+                const data = await res.json();
+                if (data.success) {
+                    loggedUser = data.user;
+                    document.getElementById('login-screen').style.display = 'none';
+                    document.getElementById('app-container').style.display = 'flex';
+                } else {
+                    alert(data.error);
+                }
+            } catch (e) { alert('Error de conexión'); }
+        }
+
+        function toggleBubble() {
+            const b = document.getElementById('bubble');
+            b.style.display = b.style.display === 'block' ? 'none' : 'block';
+        }
+
+        async function sendBotQuery() {
+            const input = document.getElementById('bot-query');
+            const q = input.value.trim();
+            if (!q) return;
+
+            input.value = '';
+            document.getElementById('bot-reply').innerText = 'Pensando...';
+
+            try {
+                const res = await fetch(`${API_URL}/chat`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ message: q })
+                });
+                const data = await res.json();
                 
-                addMessage(data.reply, 'bot');
+                document.getElementById('bot-reply').innerHTML = data.reply.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
                 
                 if (data.suggestedCompany) {
                     highlightCard(data.suggestedCompany);
                 }
-            } catch (error) {
-                addMessage('Lo siento, hubo un error de conexión.', 'bot');
+            } catch (e) {
+                document.getElementById('bot-reply').innerText = 'Hubo un error al consultar.';
             }
         }
 
-        function addMessage(text, sender) {
-            const container = document.getElementById('chat-messages');
-            const msgDiv = document.createElement('div');
-            msgDiv.className = `message ${sender}`;
-            msgDiv.innerHTML = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
-            container.appendChild(msgDiv);
-            container.scrollTop = container.scrollHeight;
-        }
-
-        function highlightCard(company) {
-            // Remove previous highlights
-            document.querySelectorAll('.card').forEach(c => c.classList.remove('active'));
-            
-            // Map suggested name to ID
-            let id = "";
-            if (company === 'Euroconnect') id = 'card-Euroconnect';
-            else if (company === 'TI Euromotors') id = 'card-Euromotors';
-            else if (company === 'Mesa de Ayuda SIS') id = 'card-SIS';
-            
-            if (id) {
-                const card = document.getElementById(id);
-                card.classList.add('active');
-                card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        function highlightCard(name) {
+            document.querySelectorAll('.card').forEach(c => c.classList.remove('highlight'));
+            const id = 'card-' + name.replace(/ /g, '-');
+            const el = document.getElementById(id);
+            if (el) {
+                el.classList.add('highlight');
+                el.scrollIntoView({ behavior: 'smooth', block: 'center' });
             }
         }
 
-        function toggleAdmin() {
-            const modal = document.getElementById('admin-modal');
-            modal.style.display = modal.style.display === 'flex' ? 'none' : 'flex';
-        }
+        function openAdmin() { document.getElementById('admin-panel').style.display = 'flex'; }
+        function closeAdmin() { document.getElementById('admin-panel').style.display = 'none'; }
 
-        let selectedFile = null;
-        function handleFileSelect(input) {
-            if (input.files.length > 0) {
-                selectedFile = input.files[0];
-                document.getElementById('file-info').textContent = selectedFile.name;
+        let fileToUpload = null;
+        function handleFile(input) {
+            if (input.files.length) {
+                fileToUpload = input.files[0];
+                document.getElementById('file-name').innerText = fileToUpload.name;
             }
         }
 
-        async function uploadDocument() {
-            if (!selectedFile) return alert('Selecciona un archivo.');
-            const formData = new FormData();
-            formData.append('document', selectedFile);
+        async function uploadWord() {
+            if (!fileToUpload) return alert('Selecciona un archivo');
+            const fd = new FormData();
+            fd.append('document', fileToUpload);
+
             try {
-                const response = await fetch(`${API_URL}/upload`, { method: 'POST', body: formData });
-                const data = await response.json();
+                const res = await fetch(`${API_URL}/upload`, { method: 'POST', body: fd });
+                const data = await res.json();
                 if (data.message) {
-                    alert('Conocimiento cargado.');
-                    toggleAdmin();
+                    alert('Conocimiento cargado para todos!');
+                    closeAdmin();
                 }
-            } catch (x) { alert('Error al subir.'); }
+            } catch (e) { alert('Error al subir'); }
         }
     </script>
 </body>

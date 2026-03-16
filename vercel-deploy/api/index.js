@@ -9,12 +9,18 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// For Vercel, we'll use /tmp to store the persistent knowledge base text
-// Note: This is ephemeral but sufficient for a demo session.
-const KB_PATH = path.join('/tmp', 'knowledge_base.txt');
+// Global knowledge base in-memory (For Vercel, this is ephemeral per instance)
+// To make it persistent for everyone forever, a real DB (like Supabase/Mongo) is required.
+let globalKnowledgeBase = "";
 
 const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
+
+// Simple Auth Middleware
+const isAdmin = (req, res, next) => {
+    // In a real app, check session/token. Simulation for now.
+    next();
+};
 
 // Upload Endpoint
 app.post('/api/upload', upload.single('document'), async (req, res) => {
@@ -24,12 +30,9 @@ app.post('/api/upload', upload.single('document'), async (req, res) => {
         }
         
         const result = await mammoth.extractRawText({ buffer: req.file.buffer });
-        const text = result.value || "";
+        globalKnowledgeBase = result.value || "";
         
-        // Save to /tmp
-        fs.writeFileSync(KB_PATH, text);
-        
-        res.json({ message: 'File uploaded and parsed successfully!', size: text.length });
+        res.json({ message: 'Global knowledge updated successfully!', size: globalKnowledgeBase.length });
     } catch (error) {
         console.error('Upload Error:', error);
         res.status(500).json({ error: 'Failed to process document.' });
@@ -41,10 +44,7 @@ app.post('/api/chat', (req, res) => {
     const { message } = req.body;
     if (!message) return res.status(400).json({ error: 'Message is required.' });
 
-    let docText = "";
-    if (fs.existsSync(KB_PATH)) {
-        docText = fs.readFileSync(KB_PATH, 'utf8').toLowerCase();
-    }
+    const docText = globalKnowledgeBase.toLowerCase();
 
     const query = message.toLowerCase();
     let response = "";
@@ -73,6 +73,16 @@ app.post('/api/chat', (req, res) => {
     }
 
     res.json({ reply: response, suggestedCompany });
+});
+
+// Mock Login Endpoint
+app.post('/api/login', (req, res) => {
+    const { username, password } = req.body;
+    if (username === 'admin' && password === 'euro123') {
+        res.json({ success: true, user: { name: 'Admin', role: 'admin' } });
+    } else {
+        res.status(401).json({ success: false, error: 'Credenciales inválidas' });
+    }
 });
 
 module.exports = app;
