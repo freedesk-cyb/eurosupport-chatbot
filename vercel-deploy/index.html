@@ -58,26 +58,33 @@
 
         /* Interactive 3D Robot */
         .robot-section {
-            position: fixed; bottom: 30px; right: 30px; z-index: 500;
+            position: fixed; bottom: 20px; right: 20px; z-index: 500;
             perspective: 1000px;
         }
         .robot-container {
-            width: 140px; height: 140px; cursor: pointer;
-            transition: 0.5s; transform-style: preserve-3d;
+            width: 180px; height: 260px; cursor: pointer;
+            transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            transform-style: preserve-3d;
             animation: robotFloat 4s ease-in-out infinite;
+            display: flex; align-items: flex-end;
         }
         @keyframes robotFloat {
-            0%, 100% { transform: translateY(0) rotateX(0deg) rotateY(0deg); }
-            50% { transform: translateY(-15px) rotateX(5deg) rotateY(10deg); }
+            0%, 100% { transform: translateY(0) rotateY(0deg); }
+            50% { transform: translateY(-10px) rotateY(5deg); }
         }
-        .robot-container:hover { transform: scale(1.1); }
+        .robot-container:hover { transform: scale(1.05); }
         .robot-container img { 
-            width: 100%; height: 100%; object-fit: contain; 
+            width: 100%; height: auto; object-fit: contain; 
             filter: drop-shadow(0 20px 30px rgba(0,0,0,0.3));
         }
 
+        /* Pointing helper */
+        .robot-pointing {
+            transform: scale(1.1) translateX(-30px) rotateY(-15deg) !important;
+        }
+
         .robot-bubble {
-            position: absolute; bottom: 160px; right: 0; width: 320px; background: rgba(255,255,255,0.98);
+            position: absolute; bottom: 270px; right: 0; width: 320px; background: rgba(255,255,255,0.98);
             border-radius: 24px; box-shadow: 0 20px 50px rgba(0,0,0,0.15); padding: 1.8rem;
             display: none; transform-origin: bottom right; animation: popIn 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
             border: 1px solid rgba(0,102,255,0.1);
@@ -175,15 +182,13 @@
                     </button>
                 </div>
             </div>
-
-            <div class="admin-trigger" onclick="openAdmin()">Acceso Manual de Conocimiento</div>
         </div>
     </div>
 
     <!-- Interactive Robot -->
     <div class="robot-section">
         <div id="robot-bot" class="robot-container" onclick="toggleBubble()">
-            <img src="robot_3d.png" alt="Robot Assistant">
+            <img src="robot_3d_full.png" alt="Robot Assistant">
         </div>
         <div id="bubble" class="robot-bubble" onclick="event.stopPropagation()">
             <div class="bubble-header">🤖 Hola, ¿cómo te ayudo hoy?</div>
@@ -230,17 +235,21 @@
 
         function toggleBubble() {
             const b = document.getElementById('bubble');
+            const robot = document.getElementById('robot-bot');
             const show = b.style.display !== 'block';
             b.style.display = show ? 'block' : 'none';
             if (show) {
                 document.getElementById('bot-reply').innerText = '¿Qué problema tienes hoy? Cuéntame y te ayudaré a crear un ticket.';
                 document.getElementById('bot-query').focus();
+            } else {
+                robot.classList.remove('robot-pointing');
             }
         }
 
         async function sendBotQuery() {
             const input = document.getElementById('bot-query');
             const q = input.value.trim();
+            const robot = document.getElementById('robot-bot');
             if (!q) return;
 
             input.value = '';
@@ -260,8 +269,10 @@
                 
                 if (data.suggestedCompany) {
                     highlightCard(data.suggestedCompany);
+                    robot.classList.add('robot-pointing');
                 } else {
                     document.querySelectorAll('.card').forEach(c => c.classList.remove('highlight'));
+                    robot.classList.remove('robot-pointing');
                 }
             } catch (e) {
                 replyEl.innerText = 'Error de comunicación del bot.';
