@@ -25,15 +25,25 @@
 
         .left-panel {
             flex: 0 0 45%;
-            background: linear-gradient(135deg, rgba(0, 10, 31, 0.7), rgba(0, 50, 150, 0.4)), url('it_bg.png');
+            background: linear-gradient(135deg, rgba(0, 5, 20, 0.9), rgba(0, 30, 100, 0.6)), url('it_bg.png');
             background-size: cover; background-position: center;
-            border-right: 1px solid rgba(255,255,255,0.1);
+            border-right: 1px solid rgba(0, 242, 255, 0.2);
+            position: relative; overflow: hidden;
         }
+        .left-panel::before {
+            content: ''; position: absolute; inset: 0;
+            background-image: 
+                linear-gradient(rgba(0, 242, 255, 0.05) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 242, 255, 0.05) 1px, transparent 1px);
+            background-size: 50px 50px;
+            animation: moveGrid 20s linear infinite;
+        }
+        @keyframes moveGrid { 0% { transform: translateY(0); } 100% { transform: translateY(50px); } }
 
         .right-panel {
             flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center;
-            background: #ffffff; position: relative; padding: 2rem;
-            box-shadow: -10px 0 30px rgba(0,0,0,0.05);
+            background: #02050a; position: relative; padding: 2rem;
+            color: #fff;
         }
 
         /* Company Selection */
@@ -63,37 +73,63 @@
             pointer-events: none;
         }
         .robot-container {
-            width: 320px; height: 480px; 
+            width: 320px; height: 520px; 
             cursor: grab;
-            transition: transform 0.1s ease-out;
+            transition: transform 0.15s cubic-bezier(0.23, 1, 0.32, 1);
             transform-style: preserve-3d;
             display: flex; align-items: flex-end; justify-content: center;
             pointer-events: auto;
             user-select: none;
+            position: relative;
         }
         .robot-container:active { cursor: grabbing; }
 
+        /* Holographic FX */
+        .robot-container::before {
+            content: ''; position: absolute; inset: 0;
+            background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0, 242, 255, 0.03) 3px);
+            pointer-events: none; z-index: 2; border-radius: 50%;
+            animation: hollowFlicker 0.2s infinite alternate;
+        }
+        @keyframes hollowFlicker { 0% { opacity: 0.8; } 100% { opacity: 1; } }
+
         .robot-container img { 
             width: 100%; height: auto; object-fit: contain; 
-            filter: drop-shadow(0 30px 60px rgba(0,0,0,0.5));
-            transition: filter 0.3s;
+            filter: drop-shadow(0 0 40px rgba(0, 242, 255, 0.2)) brightness(1.1);
+            transition: all 0.4s;
+            mix-blend-mode: screen;
+        }
+
+        /* Particles */
+        .particles {
+            position: absolute; width: 100%; height: 100%; pointer-events: none;
+        }
+        .particle {
+            position: absolute; background: #00f2ff; border-radius: 50%; opacity: 0.6;
+            animation: floatParticle linear infinite;
+        }
+        @keyframes floatParticle { 
+            0% { transform: translateY(0) scale(1); opacity: 0; }
+            50% { opacity: 0.6; }
+            100% { transform: translateY(-100px) scale(0); opacity: 0; }
         }
 
         /* Pointing & Realism helpers */
         .robot-pointing {
-            transform: scale(1.15) rotateY(-25deg) rotateX(10deg) translateX(-60px) !important;
+            transform: scale(1.1) rotateY(-35deg) rotateX(15deg) translateX(-80px) !important;
         }
         .robot-pointing img {
-            filter: drop-shadow(-20px 40px 80px rgba(0, 102, 255, 0.4));
+            filter: drop-shadow(0 0 60px rgba(0, 242, 255, 0.6)) brightness(1.3);
         }
 
         .robot-bubble {
-            position: absolute; bottom: 420px; right: 50px; width: 340px; background: rgba(255,255,255,0.95);
-            border-radius: 28px; box-shadow: 0 30px 70px rgba(0,0,0,0.25); padding: 2rem;
-            display: none; transform-origin: bottom right; animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            border: 1px solid rgba(0,102,255,0.15);
-            backdrop-filter: blur(15px);
-            z-index: 600;
+            position: absolute; bottom: 450px; right: 20px; width: 380px; 
+            background: rgba(10, 20, 40, 0.85);
+            border-radius: 0 32px 32px 32px; box-shadow: 0 30px 100px rgba(0,0,0,0.5); padding: 2.2rem;
+            display: none; transform-origin: bottom right; animation: popIn 0.6s cubic-bezier(0.19, 1, 0.22, 1);
+            border: 1px solid rgba(0, 242, 255, 0.3);
+            backdrop-filter: blur(25px);
+            z-index: 600; color: #fff;
         }
         @keyframes popIn { 
             from { transform: scale(0) translate(100px, 100px); opacity: 0; } 
@@ -206,6 +242,7 @@
     <!-- Interactive Hyper-Realistic Character Robot -->
     <div class="robot-section">
         <div id="robot-bot" class="robot-container" onmousedown="startDrag(event)" onclick="handleBotClick(event)">
+            <div class="particles" id="particles"></div>
             <div class="robot-hint">Interacción 3D Habilitada</div>
             <img id="robot-img" src="robot_character.png" alt="3D Robot Character">
         </div>
@@ -299,6 +336,23 @@
                 robot.style.transform = `rotateY(${-x}deg) rotateX(${y}deg)`;
             }
         });
+
+        // Dynamic Particles System
+        function initParticles() {
+            const container = document.getElementById('particles');
+            for(let i=0; i<30; i++) {
+                const p = document.createElement('div');
+                p.className = 'particle';
+                const size = Math.random() * 4 + 2;
+                p.style.width = p.style.height = `${size}px`;
+                p.style.left = `${Math.random() * 100}%`;
+                p.style.top = `${Math.random() * 100}%`;
+                p.style.animationDuration = `${Math.random() * 3 + 2}s`;
+                p.style.animationDelay = `${Math.random() * 5}s`;
+                container.appendChild(p);
+            }
+        }
+        initParticles();
 
         function toggleBubble() {
             const b = document.getElementById('bubble');
