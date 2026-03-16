@@ -102,94 +102,65 @@
             to { transform: scale(1.08); box-shadow: 0 0 60px rgba(0, 242, 255, 0.6); } 
         }
 
-        /* Interactive Floating Robot */
-        .robot-section {
-            position: fixed; bottom: 50px; right: 80px; z-index: 500;
-            perspective: 2000px; pointer-events: none;
+        /* Classic Professional Chatbot Widget */
+        .chat-fab {
+            position: fixed; bottom: 40px; right: 40px; width: 70px; height: 70px;
+            background: linear-gradient(135deg, #00f2ff, #0066ff);
+            border-radius: 50%; display: flex; align-items: center; justify-content: center;
+            cursor: pointer; box-shadow: 0 10px 40px rgba(0, 242, 255, 0.4);
+            z-index: 1500; transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            border: 2px solid rgba(255,255,255,0.2);
         }
-        .robot-container {
-            width: 320px; height: 420px; 
-            cursor: grab;
-            transition: transform 0.2s cubic-bezier(0.23, 1, 0.32, 1);
-            transform-style: preserve-3d;
-            display: flex; align-items: center; justify-content: center;
-            pointer-events: auto; user-select: none;
-            position: relative;
-            animation: floating 4s ease-in-out infinite;
-        }
-        @keyframes floating {
-            0%, 100% { transform: translateY(0) rotateY(var(--ry, 0deg)) rotateX(var(--rx, 0deg)); }
-            50% { transform: translateY(-25px) rotateY(var(--ry, 0deg)) rotateX(var(--rx, 0deg)); }
-        }
-        .robot-container:active { cursor: grabbing; animation-play-state: paused; }
+        .chat-fab:hover { transform: scale(1.1) rotate(5deg); box-shadow: 0 15px 50px rgba(0, 242, 255, 0.6); }
+        .chat-fab img { width: 45px; height: 45px; object-fit: contain; filter: drop-shadow(0 0 5px rgba(0,0,0,0.2)); }
 
-        /* Holographic Base */
-        .holo-base {
-            position: absolute; bottom: -80px; left: 50%; transform: translateX(-50%) rotateX(75deg);
-            width: 280px; height: 280px; border-radius: 50%;
-            background: radial-gradient(circle, rgba(0, 242, 255, 0.4) 0%, transparent 70%);
-            box-shadow: 0 0 60px rgba(0, 242, 255, 0.5);
-            pointer-events: none;
+        .chat-window {
+            position: fixed; bottom: 120px; right: 40px; width: 420px; height: 600px;
+            background: rgba(10, 20, 40, 0.9); backdrop-filter: blur(30px);
+            border: 1px solid rgba(0, 242, 255, 0.3); border-radius: 24px;
+            box-shadow: 0 30px 100px rgba(0,0,0,0.8);
+            display: none; flex-direction: column; z-index: 1500;
+            overflow: hidden; animation: slideUp 0.5s cubic-bezier(0.19, 1, 0.22, 1);
         }
-        .holo-rings {
-            position: absolute; inset: -10px; border-radius: 50%;
-            border: 2px solid rgba(0, 242, 255, 0.2);
-            animation: ringSpin 3s linear infinite;
-        }
-        .holo-rings::after {
-            content: ''; position: absolute; inset: 20px; border-radius: 50%;
-            border: 1px solid rgba(0, 242, 255, 0.4); border-top-color: transparent;
-            animation: ringSpin 2s linear infinite reverse;
-        }
-        @keyframes ringSpin { to { transform: rotate(360deg); } }
-
-        /* Holographic FX Over Robot */
-        .robot-container::before {
-            content: ''; position: absolute; inset: -20px;
-            background: linear-gradient(0deg, rgba(0, 242, 255, 0.1) 0%, transparent 20%, transparent 80%, rgba(0, 242, 255, 0.1) 100%);
-            pointer-events: none; z-index: 2; mix-blend-mode: overlay;
-        }
-
-        .robot-container img { 
-            width: 100%; height: auto; object-fit: contain; 
-            filter: drop-shadow(0 0 40px rgba(0, 242, 255, 0.2)) brightness(1.1);
-            transition: all 0.4s;
-            mix-blend-mode: screen;
-        }
-
-        /* Particles */
-        .particles {
-            position: absolute; width: 100%; height: 100%; pointer-events: none;
-        }
-        .particle {
-            position: absolute; background: #00f2ff; border-radius: 50%; opacity: 0.6;
-            animation: floatParticle linear infinite;
-        }
-        @keyframes floatParticle { 
-            0% { transform: translateY(0) scale(1); opacity: 0; }
-            50% { opacity: 0.6; }
-            100% { transform: translateY(-100px) scale(0); opacity: 0; }
-        }
-
-        /* Pointing States */
-        .point-left { --ry: 40deg !important; --rx: 10deg !important; transform: scale(1.1) rotateY(40deg) rotateX(10deg) translateX(-100px) !important; }
-        .point-center { --ry: 0deg !important; --rx: 15deg !important; transform: scale(1.1) rotateX(15deg) translateY(-20px) !important; }
-        .point-right { --ry: -40deg !important; --rx: 10deg !important; transform: scale(1.1) rotateY(-40deg) rotateX(10deg) translateX(100px) !important; }
+        @keyframes slideUp { from { transform: translateY(50px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
         
-        .robot-pointing img {
-            filter: drop-shadow(0 0 80px rgba(0, 242, 255, 0.8)) brightness(1.4);
-            transform: scale(1.05);
+        .chat-header {
+            padding: 1.5rem; background: rgba(0, 242, 255, 0.1);
+            display: flex; align-items: center; justify-content: space-between;
+            border-bottom: 1px solid rgba(0, 242, 255, 0.2);
+        }
+        .chat-header-info { display: flex; align-items: center; gap: 12px; }
+        .chat-header-info img { width: 35px; height: 35px; border-radius: 50%; background: #000; padding: 2px; border: 1px solid #00f2ff; }
+        .chat-header-info span { font-weight: 600; color: #00f2ff; letter-spacing: 1px; font-size: 0.9rem; text-transform: uppercase; }
+
+        .chat-messages {
+            flex: 1; overflow-y: auto; padding: 1.5rem; display: flex; flex-direction: column; gap: 1rem;
+            scrollbar-width: thin; scrollbar-color: #00f2ff transparent;
+        }
+        .message { max-width: 80%; padding: 1rem 1.2rem; border-radius: 18px; line-height: 1.5; font-size: 0.95rem; position: relative; }
+        .message.bot { 
+            align-self: flex-start; background: rgba(0, 242, 255, 0.05); color: #fff; 
+            border: 1px solid rgba(0, 242, 255, 0.2); border-bottom-left-radius: 4px;
+        }
+        .message.user { 
+            align-self: flex-end; background: linear-gradient(135deg, #0066ff, #0044cc); color: white;
+            border-bottom-right-radius: 4px;
         }
 
-        .robot-bubble {
-            position: absolute; bottom: 450px; right: 20px; width: 380px; 
-            background: rgba(10, 20, 40, 0.85);
-            border-radius: 0 32px 32px 32px; box-shadow: 0 30px 100px rgba(0,0,0,0.5); padding: 2.2rem;
-            display: none; transform-origin: bottom right; animation: popIn 0.6s cubic-bezier(0.19, 1, 0.22, 1);
-            border: 1px solid rgba(0, 242, 255, 0.3);
-            backdrop-filter: blur(25px);
-            z-index: 600; color: #fff;
+        .chat-input-area {
+            padding: 1.2rem; background: rgba(0,0,0,0.3); border-top: 1px solid rgba(0, 242, 255, 0.1);
+            display: flex; gap: 10px;
         }
+        .chat-input-area input {
+            flex: 1; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 12px; padding: 0.8rem 1rem; color: #fff; outline: none; transition: 0.3s;
+        }
+        .chat-input-area input:focus { border-color: #00f2ff; background: rgba(255,255,255,0.1); }
+        .chat-input-area button {
+            background: #00f2ff; border: none; width: 45px; height: 45px; border-radius: 12px;
+            cursor: pointer; transition: 0.3s; display: flex; align-items: center; justify-content: center;
+        }
+        .chat-input-area button:hover { transform: scale(1.1); box-shadow: 0 0 20px rgba(0, 242, 255, 0.5); }
         @keyframes popIn { 
             from { transform: scale(0) translate(100px, 100px); opacity: 0; } 
             to { transform: scale(1) translate(0, 0); opacity: 1; } 
@@ -298,23 +269,25 @@
         </div>
     </div>
 
-    <!-- Interactive Floating Assistant -->
-    <div class="robot-section">
-        <div id="robot-bot" class="robot-container" onmousedown="startDrag(event)" onclick="handleBotClick(event)">
-            <div class="holo-base">
-                <div class="holo-rings"></div>
+    <!-- Classic Professional Chatbot Widget -->
+    <div id="chat-fab" class="chat-fab" onclick="toggleChat()">
+        <img src="robot_character.png" alt="Chat Bot">
+    </div>
+
+    <div id="chat-window" class="chat-window">
+        <div class="chat-header">
+            <div class="chat-header-info">
+                <img src="robot_character.png" alt="Bot Avatar">
+                <span>Asistente EuroSupport</span>
             </div>
-            <div class="particles" id="particles"></div>
-            <div class="robot-hint">Asistente Holográfico Proactívo</div>
-            <img id="robot-img" src="robot_character.png" alt="Futuristic Robot">
+            <span onclick="toggleChat()" style="cursor:pointer; color: rgba(255,255,255,0.5); font-size: 1.2rem;">✕</span>
         </div>
-        <div id="bubble" class="robot-bubble" onclick="event.stopPropagation()">
-            <div class="bubble-header">✨ Asistente de Comando</div>
-            <div id="bot-reply" style="font-size: 1.05rem; margin-bottom: 25px; color: #333; line-height: 1.6; font-weight: 400;">Bienvenido al centro de soporte. ¿Necesitas ayuda especializada para generar un ticket hoy?</div>
-            <div class="bubble-input">
-                <input type="text" id="bot-query" placeholder="Describe tu solicitud..." onkeypress="if(event.key==='Enter') sendBotQuery()">
-                <button onclick="sendBotQuery()">🚀</button>
-            </div>
+        <div id="chat-messages" class="chat-messages">
+            <div class="message bot">¡Hola! ✨ Soy tu asistente profesional de EuroSupport. ¿Cómo puedo ayudarte hoy?</div>
+        </div>
+        <div class="chat-input-area">
+            <input type="text" id="chat-input" placeholder="Escribe tu mensaje..." onkeypress="if(event.key==='Enter') sendMessage()">
+            <button onclick="sendMessage()">🚀</button>
         </div>
     </div>
 
@@ -350,96 +323,30 @@
         const API_URL = '/api';
         let loggedUser = null;
 
-        // Interactive Movable Robot Logic
-        let isDragging = false;
-        let startX, startY;
-        let rotY = 0, rotX = 0;
-        const robot = document.getElementById('robot-bot');
-
-        function startDrag(e) {
-            isDragging = true;
-            startX = e.clientX;
-            startY = e.clientY;
-            document.addEventListener('mousemove', onDrag);
-            document.addEventListener('mouseup', stopDrag);
+        // Classic Chat Widget Logic
+        function toggleChat() {
+            const win = document.getElementById('chat-window');
+            const show = win.style.display !== 'flex';
+            win.style.display = show ? 'flex' : 'none';
+            if (show) document.getElementById('chat-input').focus();
         }
 
-        function onDrag(e) {
-            if (!isDragging) return;
-            const deltaX = e.clientX - startX;
-            const deltaY = e.clientY - startY;
-            rotY += deltaX * 0.5;
-            rotX -= deltaY * 0.2;
-            robot.style.transform = `rotateY(${rotY}deg) rotateX(${rotX}deg)`;
-            startX = e.clientX;
-            startY = e.clientY;
+        function addMessage(text, side) {
+            const container = document.getElementById('chat-messages');
+            const msg = document.createElement('div');
+            msg.className = `message ${side}`;
+            msg.innerHTML = text.replace(/\*\?(.*?)\*\*/g, '<strong>$1</strong>');
+            container.appendChild(msg);
+            container.scrollTop = container.scrollHeight;
         }
 
-        function stopDrag() {
-            isDragging = false;
-            document.removeEventListener('mousemove', onDrag);
-            document.removeEventListener('mouseup', stopDrag);
-        }
-
-        function handleBotClick(e) {
-            // Prevent bubble from toggling if drag happened
-            if (Math.abs(rotY % 360) > 5 || Math.abs(rotX % 360) > 5) {
-                // Was likely a drag, but reset optionally?
-            }
-            toggleBubble();
-        }
-
-        // Mouse follow subtlety
-        document.addEventListener('mousemove', (e) => {
-            if (isDragging) return;
-            const x = (window.innerWidth / 2 - e.clientX) / 40;
-            const y = (window.innerHeight / 2 - e.clientY) / 40;
-            
-            if (!robot.classList.contains('robot-pointing')) {
-                robot.style.setProperty('--ry', `${-x}deg`);
-                robot.style.setProperty('--rx', `${y}deg`);
-                robot.style.transform = `rotateY(${-x}deg) rotateX(${y}deg)`;
-            }
-        });
-
-        // Dynamic Particles System
-        function initParticles() {
-            const container = document.getElementById('particles');
-            for(let i=0; i<30; i++) {
-                const p = document.createElement('div');
-                p.className = 'particle';
-                const size = Math.random() * 4 + 2;
-                p.style.width = p.style.height = `${size}px`;
-                p.style.left = `${Math.random() * 100}%`;
-                p.style.top = `${Math.random() * 100}%`;
-                p.style.animationDuration = `${Math.random() * 3 + 2}s`;
-                p.style.animationDelay = `${Math.random() * 5}s`;
-                container.appendChild(p);
-            }
-        }
-        initParticles();
-
-        function toggleBubble() {
-            const b = document.getElementById('bubble');
-            const show = b.style.display !== 'block';
-            b.style.display = show ? 'block' : 'none';
-            if (show) {
-                document.getElementById('bot-reply').innerHTML = 'Entendido. Estoy a tu disposición. <strong>¡Cuéntame tu problema para indicarte el camino correcto!</strong>';
-                document.getElementById('bot-query').focus();
-            } else {
-                robot.classList.remove('robot-pointing');
-            }
-        }
-
-        async function sendBotQuery() {
-            const input = document.getElementById('bot-query');
+        async function sendMessage() {
+            const input = document.getElementById('chat-input');
             const q = input.value.trim();
-            const robot = document.getElementById('robot-bot');
             if (!q) return;
 
+            addMessage(q, 'user');
             input.value = '';
-            const replyEl = document.getElementById('bot-reply');
-            replyEl.innerHTML = '<span style="color: #00f2ff; opacity: 0.6;">Sincronizando con la red...</span>';
 
             try {
                 const res = await fetch(`${API_URL}/chat`, {
@@ -449,24 +356,13 @@
                 });
                 const data = await res.json();
                 
-                replyEl.innerHTML = data.reply.replace(/\*\?(.*?)\*\*/g, '<strong>$1</strong>');
-                
-                // Clear any previous pointing classes
-                robot.classList.remove('robot-pointing', 'point-left', 'point-center', 'point-right');
+                addMessage(data.reply, 'bot');
 
                 if (data.suggestedCompany) {
                     highlightCard(data.suggestedCompany);
-                    robot.classList.add('robot-pointing');
-                    
-                    // Specific pointing direction
-                    if (data.suggestedCompany === "Euroconnect") robot.classList.add('point-left');
-                    else if (data.suggestedCompany === "TI Euromotors") robot.classList.add('point-center');
-                    else robot.classList.add('point-right');
-                } else {
-                    document.querySelectorAll('.card').forEach(c => c.classList.remove('highlight'));
                 }
             } catch (e) {
-                replyEl.innerText = 'Error en el núcleo de comunicación.';
+                addMessage('Lo siento, hay un problema técnico en mi núcleo de comunicación. 🛠️', 'bot');
             }
         }
 
