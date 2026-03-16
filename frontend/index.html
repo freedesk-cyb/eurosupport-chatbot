@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EuroSupport | Asistente Inteligente</title>
+    <title>EuroSupport | Central de Ayuda Inteligente</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600&display=swap" rel="stylesheet">
@@ -11,448 +11,321 @@
         :root {
             --primary: #0066ff;
             --accent: #00f2ff;
-            --bg: #050a15;
-            --glass: rgba(255, 255, 255, 0.05);
-            --glass-border: rgba(255, 255, 255, 0.1);
-            --text: #ffffff;
-            --text-dim: #a0a0a0;
+            --bg-light: #f8f9fa;
+            --text-dark: #1a1a1a;
+            --border: #e0e0e0;
+            --shadow: 0 10px 30px rgba(0,0,0,0.1);
         }
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Outfit', sans-serif;
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Outfit', sans-serif; }
+        body { height: 100vh; background: var(--bg-light); overflow: hidden; }
+
+        /* App Layout (Split Screen) */
+        #app-container { display: flex; height: 100vh; width: 100%; flex-direction: row; }
+
+        .left-panel {
+            flex: 0 0 45%;
+            background: linear-gradient(135deg, rgba(0, 10, 31, 0.7), rgba(0, 50, 150, 0.4)), url('it_bg.png');
+            background-size: cover; background-position: center;
+            border-right: 1px solid rgba(255,255,255,0.1);
         }
 
-        body {
-            background: var(--bg);
-            background-image: 
-                radial-gradient(circle at 20% 20%, rgba(0, 102, 255, 0.15) 0%, transparent 40%),
-                radial-gradient(circle at 80% 80%, rgba(0, 242, 255, 0.1) 0%, transparent 40%);
-            color: var(--text);
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
+        .right-panel {
+            flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center;
+            background: #ffffff; position: relative; padding: 2rem;
+            box-shadow: -10px 0 30px rgba(0,0,0,0.05);
         }
 
-        /* Navbar */
-        nav {
-            padding: 1.5rem 2rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background: rgba(5, 10, 21, 0.8);
+        /* Company Selection */
+        .selection-area { text-align: center; width: 100%; max-width: 800px; }
+        .company-cards { display: flex; flex-wrap: wrap; justify-content: center; gap: 2rem; margin-top: 3rem; }
+        .card {
+            background: #fff; border: 1px solid var(--border); border-radius: 20px;
+            padding: 2.5rem; width: 240px; cursor: pointer; transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            display: flex; flex-direction: column; align-items: center; gap: 1.5rem;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.02);
+        }
+        .card:hover { transform: translateY(-15px); border-color: var(--primary); box-shadow: 0 20px 40px rgba(0, 102, 255, 0.15); }
+        .card.highlight { 
+            border: 3px solid var(--primary); 
+            box-shadow: 0 0 40px rgba(0, 102, 255, 0.3); 
+            animation: cardGlow 2s infinite;
+        }
+        @keyframes cardGlow { 
+            0%, 100% { transform: scale(1); box-shadow: 0 0 40px rgba(0, 102, 255, 0.3); } 
+            50% { transform: scale(1.05); box-shadow: 0 0 60px rgba(0, 102, 255, 0.5); } 
+        }
+
+        /* Interactive 3D Robot */
+        .robot-section {
+            position: fixed; bottom: 20px; right: 20px; z-index: 500;
+            perspective: 1000px;
+        }
+        .robot-container {
+            width: 180px; height: 260px; cursor: pointer;
+            transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            transform-style: preserve-3d;
+            animation: robotFloat 4s ease-in-out infinite;
+            display: flex; align-items: flex-end;
+        }
+        @keyframes robotFloat {
+            0%, 100% { transform: translateY(0) rotateY(0deg); }
+            50% { transform: translateY(-10px) rotateY(5deg); }
+        }
+        .robot-container:hover { transform: scale(1.05); }
+        .robot-container img { 
+            width: 100%; height: auto; object-fit: contain; 
+            filter: drop-shadow(0 20px 30px rgba(0,0,0,0.3));
+        }
+
+        /* Pointing helper */
+        .robot-pointing {
+            transform: scale(1.1) translateX(-30px) rotateY(-15deg) !important;
+        }
+
+        .robot-bubble {
+            position: absolute; bottom: 270px; right: 0; width: 320px; background: rgba(255,255,255,0.98);
+            border-radius: 24px; box-shadow: 0 20px 50px rgba(0,0,0,0.15); padding: 1.8rem;
+            display: none; transform-origin: bottom right; animation: popIn 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            border: 1px solid rgba(0,102,255,0.1);
             backdrop-filter: blur(10px);
-            border-bottom: 1px solid var(--glass-border);
-            z-index: 100;
+        }
+        @keyframes popIn { from { transform: scale(0) translateY(100px); opacity: 0; } to { transform: scale(1) translateY(0); opacity: 1; } }
+
+        .bubble-header { display: flex; align-items: center; gap: 12px; margin-bottom: 18px; color: var(--primary); font-weight: 600; font-size: 1.1rem; }
+        .bubble-input { display: flex; gap: 10px; background: #f0f4f8; padding: 5px; border-radius: 12px; }
+        .bubble-input input { flex: 1; border: none; background: transparent; padding: 0.8rem; outline: none; font-size: 0.9rem; }
+        .bubble-input button { background: var(--primary); border: none; padding: 0 1.2rem; border-radius: 10px; color: white; cursor: pointer; transition: 0.3s; }
+        .bubble-input button:hover { background: #0052cc; }
+
+        /* Knowledge Corner (Corner button) */
+        .knowledge-corner {
+            position: fixed; top: 30px; right: 30px; z-index: 1000;
+        }
+        .knowledge-btn {
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            color: white; width: 60px; height: 60px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.5rem; cursor: pointer; box-shadow: 0 10px 20px rgba(0, 102, 255, 0.3);
+            transition: 0.3s; border: 2px solid rgba(255,255,255,0.2);
+        }
+        .knowledge-btn:hover { transform: rotate(90deg) scale(1.1); }
+        .knowledge-label {
+            position: absolute; right: 70px; top: 15px; background: var(--text-dark);
+            color: white; padding: 5px 15px; border-radius: 20px; font-size: 0.8rem;
+            white-space: nowrap; opacity: 0; transition: 0.3s; pointer-events: none;
+        }
+        .knowledge-corner:hover .knowledge-label { opacity: 1; right: 80px; }
+
+        /* Admin Section Overlay */
+        #admin-panel {
+            position: fixed; inset: 0; background: rgba(0,10,31,0.85); z-index: 2000;
+            display: none; align-items: center; justify-content: center;
+            backdrop-filter: blur(8px);
+        }
+        .admin-box { 
+            background: white; padding: 3.5rem; border-radius: 30px; width: 500px; 
+            text-align: center; position: relative;
+            box-shadow: 0 30px 60px rgba(0,0,0,0.5);
+        }
+        .admin-box h2 { color: var(--text-dark); margin-bottom: 1.5rem; font-size: 1.8rem; }
+        .close-btn { position: absolute; top: 25px; right: 25px; cursor: pointer; font-size: 1.5rem; color: #ccc; transition: 0.3s; }
+        .close-btn:hover { color: var(--primary); transform: rotate(90deg); }
+
+        .admin-trigger { position: absolute; bottom: 20px; left: 20px; font-size: 0.8rem; color: #999; cursor: pointer; text-decoration: underline; opacity: 0.5; }
+        .admin-trigger:hover { opacity: 1; }
+
+        #password-gate { margin-bottom: 2rem; }
+        #password-gate input { 
+            width: 100%; padding: 1rem; border: 1px solid var(--border); 
+            border-radius: 12px; text-align: center; font-size: 1.1rem; letter-spacing: 5px;
         }
 
-        .logo {
-            font-size: 1.5rem;
-            font-weight: 600;
-            letter-spacing: 1px;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .logo span {
-            color: var(--primary);
-        }
-
-        .nav-links {
-            display: flex;
-            gap: 2rem;
-        }
-
-        .nav-links button {
-            background: none;
-            border: none;
-            color: var(--text-dim);
-            cursor: pointer;
-            font-size: 0.9rem;
-            transition: 0.3s;
-            position: relative;
-        }
-
-        .nav-links button.active {
-            color: var(--text);
-        }
-
-        .nav-links button.active::after {
-            content: '';
-            position: absolute;
-            bottom: -5px;
-            left: 0;
-            width: 100%;
-            height: 2px;
-            background: var(--primary);
-            border-radius: 2px;
-        }
-
-        /* Container */
-        main {
-            flex: 1;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 2rem;
-            position: relative;
-        }
-
-        .view-panel {
-            width: 100%;
-            max-width: 900px;
-            height: 700px;
-            background: var(--glass);
-            backdrop-filter: blur(20px);
-            border: 1px solid var(--glass-border);
-            border-radius: 24px;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-            display: none;
-            flex-direction: column;
-            animation: fadeIn 0.5s ease-out;
-        }
-
-        .view-panel.active {
-            display: flex;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        /* Chat UI */
-        #chat-view {
-            overflow: hidden;
-        }
-
-        .chat-header {
-            padding: 1.5rem 2rem;
-            border-bottom: 1px solid var(--glass-border);
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-        }
-
-        .status-dot {
-            width: 10px;
-            height: 10px;
-            background: #00ff88;
-            border-radius: 50%;
-            box-shadow: 0 0 10px #00ff88;
-        }
-
-        .chat-messages {
-            flex: 1;
-            padding: 2rem;
-            overflow-y: auto;
-            display: flex;
-            flex-direction: column;
-            gap: 1.5rem;
-        }
-
-        .message {
-            max-width: 80%;
-            padding: 1rem 1.5rem;
-            border-radius: 18px;
-            line-height: 1.5;
-            font-size: 0.95rem;
-            animation: slideIn 0.3s ease-out;
-        }
-
-        @keyframes slideIn {
-            from { opacity: 0; transform: translateX(-10px); }
-            to { opacity: 1; transform: translateX(0); }
-        }
-
-        .message.bot {
-            align-self: flex-start;
-            background: var(--glass);
-            border: 1px solid var(--glass-border);
-            border-bottom-left-radius: 4px;
-        }
-
-        .message.user {
-            align-self: flex-end;
-            background: var(--primary);
-            color: white;
-            border-bottom-right-radius: 4px;
-        }
-
-        .chat-input-area {
-            padding: 1.5rem 2rem;
-            border-top: 1px solid var(--glass-border);
-            display: flex;
-            gap: 1rem;
-        }
-
-        input[type="text"] {
-            flex: 1;
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid var(--glass-border);
-            border-radius: 12px;
-            padding: 0.8rem 1.2rem;
-            color: white;
-            outline: none;
-            transition: 0.3s;
-        }
-
-        input[type="text"]:focus {
-            border-color: var(--primary);
-            background: rgba(255, 255, 255, 0.1);
-        }
-
-        .send-btn {
-            background: var(--primary);
-            border: none;
-            border-radius: 12px;
-            width: 45px;
-            height: 45px;
-            cursor: pointer;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            transition: 0.3s;
-        }
-
-        .send-btn:hover {
-            transform: scale(1.05);
-            background: var(--accent);
-        }
-
-        /* Admin UI */
-        .admin-content {
-            padding: 3rem;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            height: 100%;
-            text-align: center;
-        }
-
-        .upload-card {
-            width: 100%;
-            max-width: 400px;
-            padding: 2.5rem;
-            background: rgba(255, 255, 255, 0.03);
-            border: 2px dashed var(--glass-border);
-            border-radius: 20px;
-            transition: 0.3s;
-            cursor: pointer;
-        }
-
-        .upload-card:hover {
-            border-color: var(--primary);
-            background: rgba(0, 102, 255, 0.05);
-        }
-
-        .upload-icon {
-            font-size: 3rem;
-            margin-bottom: 1rem;
-            display: block;
-        }
-
-        .upload-btn {
-            margin-top: 2rem;
-            padding: 0.8rem 2rem;
-            background: var(--primary);
-            border: none;
-            border-radius: 10px;
-            color: white;
-            font-weight: 600;
-            cursor: pointer;
-            transition: 0.3s;
-        }
-
-        .upload-btn:hover {
-            background: var(--accent);
-            box-shadow: 0 0 20px var(--primary);
-        }
-
-        #file-info {
-            margin-top: 1rem;
-            font-size: 0.85rem;
-            color: var(--text-dim);
-        }
-
-        /* Notifications */
-        .toast {
-            position: fixed;
-            bottom: 2rem;
-            right: 2rem;
-            padding: 1rem 2rem;
-            background: var(--primary);
-            border-radius: 10px;
-            color: white;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-            transform: translateY(150%);
-            transition: 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        }
-
-        .toast.show {
-            transform: translateY(0);
-        }
-
-        /* Scrollbar */
-        ::-webkit-scrollbar {
-            width: 6px;
-        }
-        ::-webkit-scrollbar-track {
-            background: transparent;
-        }
-        ::-webkit-scrollbar-thumb {
-            background: var(--glass-border);
-            border-radius: 10px;
-        }
     </style>
 </head>
 <body>
 
-    <nav>
-        <div class="logo">EURO<span>SUPPORT</span></div>
-        <div class="nav-links">
-            <button id="nav-chat" class="active" onclick="switchView('chat')">Chatbot</button>
-            <button id="nav-admin" onclick="switchView('admin')">Administrador</button>
-        </div>
-    </nav>
+    <!-- Knowledge Upload Corner -->
+    <div class="knowledge-corner">
+        <div class="knowledge-label">Subir Manual de Conocimiento</div>
+        <div class="knowledge-btn" onclick="openAdmin()">📄</div>
+    </div>
 
-    <main>
-        <!-- Chat View -->
-        <div id="chat-view" class="view-panel active">
-            <div class="chat-header">
-                <div class="status-dot"></div>
-                <div>
-                    <h3 style="font-size: 1rem;">Asistente Virtual</h3>
-                    <p style="font-size: 0.75rem; color: var(--text-dim);">En línea • Listo para ayudarte</p>
-                </div>
-            </div>
-            <div class="chat-messages" id="chat-messages">
-                <div class="message bot">
-                    ¡Hola! Soy tu asistente de EuroSupport. Indícame qué problema tienes y te guiaré para crear tu ticket correctamente.
-                </div>
-            </div>
-            <div class="chat-input-area">
-                <input type="text" id="user-input" placeholder="Escribe tu problema aquí..." onkeypress="if(event.key === 'Enter') sendMessage()">
-                <button class="send-btn" onclick="sendMessage()">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
-                </button>
-            </div>
-        </div>
 
-        <!-- Admin View -->
-        <div id="admin-view" class="view-panel">
-            <div class="admin-content">
-                <h2 style="margin-bottom: 1rem;">Base de Conocimientos</h2>
-                <p style="color: var(--text-dim); margin-bottom: 2.5rem;">Carga un archivo Word (.docx) con las reglas de redirección para el chatbot.</p>
-                
-                <div class="upload-card" onclick="document.getElementById('file-input').click()">
-                    <span class="upload-icon">📄</span>
-                    <p style="font-weight: 500;">Haz clic o arrastra un archivo Word</p>
-                    <p style="font-size: 0.8rem; color: var(--text-dim);">Soporte para archivos .docx</p>
-                    <input type="file" id="file-input" accept=".docx" style="display: none;" onchange="handleFileSelect(this)">
-                    <div id="file-info">Ningún archivo seleccionado</div>
+    <!-- App -->
+    <div id="app-container">
+        <div class="left-panel"></div>
+        <div class="right-panel">
+            <div class="selection-area">
+                <h1 style="font-size: 3rem; margin-bottom: 0.8rem; letter-spacing: -1px;">Centros de Soporte</h1>
+                <p style="color: #777; font-size: 1.1rem; margin-bottom: 4rem;">Selecciona el área para gestionar tu requerimiento</p>
+
+                <div class="company-cards">
+                    <div class="card" id="card-Euroconnect">
+                        <img src="https://cdn-icons-png.flaticon.com/512/2891/2891415.png" height="60">
+                        <span style="font-weight: 600; font-size: 1.2rem;">Euroconnect</span>
+                    </div>
+                    <div class="card" id="card-TI-Euromotors">
+                        <img src="https://cdn-icons-png.flaticon.com/512/3202/3202926.png" height="60">
+                        <span style="font-weight: 600; font-size: 1.2rem;">TI Euromotors</span>
+                    </div>
+                    <div class="card" id="card-Mesa-de-Ayuda-SIS">
+                        <img src="https://cdn-icons-png.flaticon.com/512/1063/1063376.png" height="60">
+                        <span style="font-weight: 600; font-size: 1.2rem;">Mesa de Ayuda SIS</span>
+                    </div>
                 </div>
 
-                <button class="upload-btn" onclick="uploadDocument()">Subir Documento</button>
+                <div style="margin-top: 5rem;">
+                    <button style="display: flex; align-items: center; gap: 12px; margin: 0 auto; padding: 1rem 2.5rem; border: 1px solid #eee; background: white; border-radius: 15px; cursor: pointer; box-shadow: 0 5px 15px rgba(0,0,0,0.05); font-weight: 500;">
+                        <img src="https://www.gstatic.com/images/branding/product/1x/gsa_512dp.png" width="22">
+                        Acceder con Google Workspace
+                    </button>
+                </div>
             </div>
         </div>
-    </main>
+    </div>
 
-    <div id="toast" class="toast">¡Archivo subido con éxito!</div>
+    <!-- Interactive Robot -->
+    <div class="robot-section">
+        <div id="robot-bot" class="robot-container" onclick="toggleBubble()">
+            <img src="robot_3d_full.png" alt="Robot Assistant">
+        </div>
+        <div id="bubble" class="robot-bubble" onclick="event.stopPropagation()">
+            <div class="bubble-header">🤖 Hola, ¿cómo te ayudo hoy?</div>
+            <div id="bot-reply" style="font-size: 0.95rem; margin-bottom: 22px; color: #444; line-height: 1.5;">Soy tu asistente inteligente. ¿Tienes algún problema técnico o quieres crear un ticket?</div>
+            <div class="bubble-input">
+                <input type="text" id="bot-query" placeholder="Escribe tu consulta aquí..." onkeypress="if(event.key==='Enter') sendBotQuery()">
+                <button onclick="sendBotQuery()">➤</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Admin Panel -->
+    <div id="admin-panel">
+        <div class="admin-box">
+            <span class="close-btn" onclick="closeAdmin()">✕</span>
+            <h2>Base de Conocimiento</h2>
+            
+            <div id="password-gate">
+                <p style="color: #666; margin-bottom: 1.5rem;">Ingresa la clave maestra para subir archivos</p>
+                <input type="password" id="admin-password" placeholder="••••••••">
+            </div>
+
+            <p style="color: #888; font-size: 0.85rem; margin-bottom: 2rem;">El documento Word se replicará en tiempo real para todos los usuarios del sistema.</p>
+            
+            <div style="border: 2px dashed #0066ff33; padding: 3rem; border-radius: 20px; cursor: pointer; background: #f8fbff; transition: 0.3s;" 
+                 onmouseover="this.style.borderColor='#0066ff'" onmouseout="this.style.borderColor='#0066ff33'"
+                 onclick="document.getElementById('file-input').click()">
+                <div style="font-size: 2.5rem; margin-bottom: 10px;">📄</div>
+                <div style="font-weight: 500; color: #444;">Seleccionar archivo .docx</div>
+                <input type="file" id="file-input" accept=".docx" style="display:none" onchange="handleFile(this)">
+                <div id="file-name" style="margin-top: 15px; font-size: 0.85rem; color: var(--primary); font-weight: 600;"></div>
+            </div>
+
+            <button onclick="uploadWord()" style="margin-top: 2.5rem; width: 100%; padding: 1.2rem; background: var(--primary); color: white; border: none; border-radius: 15px; font-weight: 600; cursor: pointer; box-shadow: 0 10px 20px rgba(0,102,255,0.25);">
+                Sincronizar Conocimiento Global
+            </button>
+        </div>
+    </div>
 
     <script>
-        const API_URL = 'http://localhost:3001/api';
+        const API_URL = '/api';
+        let loggedUser = null;
 
-        function switchView(view) {
-            document.querySelectorAll('.view-panel').forEach(p => p.classList.remove('active'));
-            document.querySelectorAll('.nav-links button').forEach(b => b.classList.remove('active'));
-            
-            if (view === 'chat') {
-                document.getElementById('chat-view').classList.add('active');
-                document.getElementById('nav-chat').classList.add('active');
+
+        function toggleBubble() {
+            const b = document.getElementById('bubble');
+            const robot = document.getElementById('robot-bot');
+            const show = b.style.display !== 'block';
+            b.style.display = show ? 'block' : 'none';
+            if (show) {
+                document.getElementById('bot-reply').innerText = '¿Qué problema tienes hoy? Cuéntame y te ayudaré a crear un ticket.';
+                document.getElementById('bot-query').focus();
             } else {
-                document.getElementById('admin-view').classList.add('active');
-                document.getElementById('nav-admin').classList.add('active');
+                robot.classList.remove('robot-pointing');
             }
         }
 
-        let selectedFile = null;
+        async function sendBotQuery() {
+            const input = document.getElementById('bot-query');
+            const q = input.value.trim();
+            const robot = document.getElementById('robot-bot');
+            if (!q) return;
 
-        function handleFileSelect(input) {
-            if (input.files.length > 0) {
-                selectedFile = input.files[0];
-                document.getElementById('file-info').textContent = selectedFile.name;
-            }
-        }
-
-        async function uploadDocument() {
-            if (!selectedFile) {
-                alert('Por favor, selecciona un archivo primero.');
-                return;
-            }
-
-            const formData = new FormData();
-            formData.append('document', selectedFile);
-
-            try {
-                const response = await fetch(`${API_URL}/upload`, {
-                    method: 'POST',
-                    body: formData
-                });
-                const data = await response.json();
-                
-                if (data.message) {
-                    showToast('Documento cargado correctamente');
-                    selectedFile = null;
-                    document.getElementById('file-info').textContent = 'Ningún archivo seleccionado';
-                }
-            } catch (error) {
-                console.error('Error:', error);
-                alert('Error al subir el archivo. Asegúrate que el servidor esté corriendo.');
-            }
-        }
-
-        async function sendMessage() {
-            const input = document.getElementById('user-input');
-            const message = input.value.trim();
-            if (!message) return;
-
-            addMessage(message, 'user');
             input.value = '';
+            const replyEl = document.getElementById('bot-reply');
+            replyEl.innerHTML = '<span style="color: #888">Analizando requerimiento...</span>';
 
             try {
-                const response = await fetch(`${API_URL}/chat`, {
+                const res = await fetch(`${API_URL}/chat`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ message })
+                    body: JSON.stringify({ message: q })
                 });
-                const data = await response.json();
-                addMessage(data.reply, 'bot');
-            } catch (error) {
-                addMessage('Lo siento, no pude contactar con el servidor. ¿Está el backend encendido?', 'bot');
+                const data = await res.json();
+                
+                // Animación de escritura simple
+                replyEl.innerHTML = data.reply.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+                
+                if (data.suggestedCompany) {
+                    highlightCard(data.suggestedCompany);
+                    robot.classList.add('robot-pointing');
+                } else {
+                    document.querySelectorAll('.card').forEach(c => c.classList.remove('highlight'));
+                    robot.classList.remove('robot-pointing');
+                }
+            } catch (e) {
+                replyEl.innerText = 'Error de comunicación del bot.';
             }
         }
 
-        function addMessage(text, sender) {
-            const container = document.getElementById('chat-messages');
-            const msgDiv = document.createElement('div');
-            msgDiv.className = `message ${sender}`;
-            msgDiv.innerText = text;
-            container.appendChild(msgDiv);
-            container.scrollTop = container.scrollHeight;
+        function highlightCard(name) {
+            document.querySelectorAll('.card').forEach(c => c.classList.remove('highlight'));
+            const id = 'card-' + name.replace(/ /g, '-');
+            const el = document.getElementById(id);
+            if (el) {
+                el.classList.add('highlight');
+                el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
         }
 
-        function showToast(msg) {
-            const toast = document.getElementById('toast');
-            toast.innerText = msg;
-            toast.classList.add('show');
-            setTimeout(() => toast.classList.remove('show'), 3000);
+        function openAdmin() { 
+            document.getElementById('admin-panel').style.display = 'flex'; 
+            document.getElementById('admin-password').focus();
+        }
+        function closeAdmin() { document.getElementById('admin-panel').style.display = 'none'; }
+
+        let fileToUpload = null;
+        function handleFile(input) {
+            if (input.files.length) {
+                fileToUpload = input.files[0];
+                document.getElementById('file-name').innerText = fileToUpload.name;
+            }
+        }
+
+        async function uploadWord() {
+            const pass = document.getElementById('admin-password').value;
+            if (!pass) return alert('Se requiere la contraseña maestra.');
+            if (!fileToUpload) return alert('Por favor, selecciona un archivo .docx');
+            
+            const fd = new FormData();
+            fd.append('document', fileToUpload);
+            fd.append('password', pass);
+
+            try {
+                const res = await fetch(`${API_URL}/upload`, { method: 'POST', body: fd });
+                const data = await res.json();
+                if (data.message) {
+                    alert('¡Base de conocimiento actualizada para todos los terminales!');
+                    document.getElementById('admin-password').value = '';
+                    closeAdmin();
+                } else {
+                    alert(data.error || 'Fallo en la carga.');
+                }
+            } catch (e) { alert('Error al procesar el archivo.'); }
         }
     </script>
+</body>
+</html>
 </body>
 </html>
