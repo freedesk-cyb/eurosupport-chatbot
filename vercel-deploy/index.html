@@ -56,90 +56,63 @@
             50% { transform: scale(1.05); box-shadow: 0 0 60px rgba(0, 102, 255, 0.5); } 
         }
 
-        /* Interactive 3D Robot */
+        /* Interactive 3D Robot (Improved) */
         .robot-section {
-            position: fixed; bottom: 20px; right: 20px; z-index: 500;
-            perspective: 1000px;
+            position: fixed; bottom: -20px; right: -20px; z-index: 500;
+            perspective: 2000px;
+            pointer-events: none;
         }
         .robot-container {
-            width: 180px; height: 260px; cursor: pointer;
-            transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            width: 320px; height: 480px; 
+            cursor: grab;
+            transition: transform 0.1s ease-out;
             transform-style: preserve-3d;
-            animation: robotFloat 4s ease-in-out infinite;
-            display: flex; align-items: flex-end;
+            display: flex; align-items: flex-end; justify-content: center;
+            pointer-events: auto;
+            user-select: none;
         }
-        @keyframes robotFloat {
-            0%, 100% { transform: translateY(0) rotateY(0deg); }
-            50% { transform: translateY(-10px) rotateY(5deg); }
-        }
-        .robot-container:hover { transform: scale(1.05); }
+        .robot-container:active { cursor: grabbing; }
+
         .robot-container img { 
             width: 100%; height: auto; object-fit: contain; 
-            filter: drop-shadow(0 20px 30px rgba(0,0,0,0.3));
+            filter: drop-shadow(0 30px 60px rgba(0,0,0,0.5));
+            transition: filter 0.3s;
         }
 
-        /* Pointing helper */
+        /* Pointing & Realism helpers */
         .robot-pointing {
-            transform: scale(1.1) translateX(-30px) rotateY(-15deg) !important;
+            transform: scale(1.15) rotateY(-25deg) rotateX(10deg) translateX(-60px) !important;
+        }
+        .robot-pointing img {
+            filter: drop-shadow(-20px 40px 80px rgba(0, 102, 255, 0.4));
         }
 
         .robot-bubble {
-            position: absolute; bottom: 270px; right: 0; width: 320px; background: rgba(255,255,255,0.98);
-            border-radius: 24px; box-shadow: 0 20px 50px rgba(0,0,0,0.15); padding: 1.8rem;
-            display: none; transform-origin: bottom right; animation: popIn 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-            border: 1px solid rgba(0,102,255,0.1);
-            backdrop-filter: blur(10px);
+            position: absolute; bottom: 420px; right: 50px; width: 340px; background: rgba(255,255,255,0.95);
+            border-radius: 28px; box-shadow: 0 30px 70px rgba(0,0,0,0.25); padding: 2rem;
+            display: none; transform-origin: bottom right; animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            border: 1px solid rgba(0,102,255,0.15);
+            backdrop-filter: blur(15px);
+            z-index: 600;
         }
-        @keyframes popIn { from { transform: scale(0) translateY(100px); opacity: 0; } to { transform: scale(1) translateY(0); opacity: 1; } }
+        @keyframes popIn { 
+            from { transform: scale(0) translate(100px, 100px); opacity: 0; } 
+            to { transform: scale(1) translate(0, 0); opacity: 1; } 
+        }
 
-        .bubble-header { display: flex; align-items: center; gap: 12px; margin-bottom: 18px; color: var(--primary); font-weight: 600; font-size: 1.1rem; }
-        .bubble-input { display: flex; gap: 10px; background: #f0f4f8; padding: 5px; border-radius: 12px; }
-        .bubble-input input { flex: 1; border: none; background: transparent; padding: 0.8rem; outline: none; font-size: 0.9rem; }
-        .bubble-input button { background: var(--primary); border: none; padding: 0 1.2rem; border-radius: 10px; color: white; cursor: pointer; transition: 0.3s; }
-        .bubble-input button:hover { background: #0052cc; }
+        .bubble-header { display: flex; align-items: center; gap: 15px; margin-bottom: 20px; color: var(--primary); font-weight: 700; font-size: 1.2rem; }
+        .bubble-input { display: flex; gap: 12px; background: #f4f7fa; padding: 8px; border-radius: 16px; border: 1px solid #eee; }
+        .bubble-input input { flex: 1; border: none; background: transparent; padding: 0.8rem; outline: none; font-size: 1rem; color: #333; }
+        .bubble-input button { background: linear-gradient(135deg, var(--primary), #0052cc); border: none; padding: 0 1.5rem; border-radius: 12px; color: white; cursor: pointer; transition: 0.3s; font-size: 1.1rem; }
+        .bubble-input button:hover { transform: scale(1.05); box-shadow: 0 5px 15px rgba(0,102,255,0.3); }
 
-        /* Knowledge Corner (Corner button) */
-        .knowledge-corner {
-            position: fixed; top: 30px; right: 30px; z-index: 1000;
+        /* Dragging hint */
+        .robot-hint {
+            position: absolute; top: 20px; width: 100%; text-align: center;
+            font-size: 0.75rem; color: #aaa; text-transform: uppercase; letter-spacing: 2px;
+            opacity: 0; transition: 0.5s; pointer-events: none;
         }
-        .knowledge-btn {
-            background: linear-gradient(135deg, var(--primary), var(--accent));
-            color: white; width: 60px; height: 60px; border-radius: 50%;
-            display: flex; align-items: center; justify-content: center;
-            font-size: 1.5rem; cursor: pointer; box-shadow: 0 10px 20px rgba(0, 102, 255, 0.3);
-            transition: 0.3s; border: 2px solid rgba(255,255,255,0.2);
-        }
-        .knowledge-btn:hover { transform: rotate(90deg) scale(1.1); }
-        .knowledge-label {
-            position: absolute; right: 70px; top: 15px; background: var(--text-dark);
-            color: white; padding: 5px 15px; border-radius: 20px; font-size: 0.8rem;
-            white-space: nowrap; opacity: 0; transition: 0.3s; pointer-events: none;
-        }
-        .knowledge-corner:hover .knowledge-label { opacity: 1; right: 80px; }
-
-        /* Admin Section Overlay */
-        #admin-panel {
-            position: fixed; inset: 0; background: rgba(0,10,31,0.85); z-index: 2000;
-            display: none; align-items: center; justify-content: center;
-            backdrop-filter: blur(8px);
-        }
-        .admin-box { 
-            background: white; padding: 3.5rem; border-radius: 30px; width: 500px; 
-            text-align: center; position: relative;
-            box-shadow: 0 30px 60px rgba(0,0,0,0.5);
-        }
-        .admin-box h2 { color: var(--text-dark); margin-bottom: 1.5rem; font-size: 1.8rem; }
-        .close-btn { position: absolute; top: 25px; right: 25px; cursor: pointer; font-size: 1.5rem; color: #ccc; transition: 0.3s; }
-        .close-btn:hover { color: var(--primary); transform: rotate(90deg); }
-
-        .admin-trigger { position: absolute; bottom: 20px; left: 20px; font-size: 0.8rem; color: #999; cursor: pointer; text-decoration: underline; opacity: 0.5; }
-        .admin-trigger:hover { opacity: 1; }
-
-        #password-gate { margin-bottom: 2rem; }
-        #password-gate input { 
-            width: 100%; padding: 1rem; border: 1px solid var(--border); 
-            border-radius: 12px; text-align: center; font-size: 1.1rem; letter-spacing: 5px;
-        }
+        .robot-container:hover .robot-hint { opacity: 1; }
 
     </style>
 </head>
@@ -147,55 +120,55 @@
 
     <!-- Knowledge Upload Corner -->
     <div class="knowledge-corner">
-        <div class="knowledge-label">Subir Manual de Conocimiento</div>
-        <div class="knowledge-btn" onclick="openAdmin()">📄</div>
+        <div class="knowledge-label">Gestión de Conocimiento</div>
+        <div class="knowledge-btn" onclick="openAdmin()">⚡</div>
     </div>
-
 
     <!-- App -->
     <div id="app-container">
         <div class="left-panel"></div>
         <div class="right-panel">
             <div class="selection-area">
-                <h1 style="font-size: 3rem; margin-bottom: 0.8rem; letter-spacing: -1px;">Centros de Soporte</h1>
-                <p style="color: #777; font-size: 1.1rem; margin-bottom: 4rem;">Selecciona el área para gestionar tu requerimiento</p>
+                <h1 style="font-size: 3.5rem; margin-bottom: 0.8rem; letter-spacing: -2px; font-weight: 600;">Centro de Comando</h1>
+                <p style="color: #666; font-size: 1.2rem; margin-bottom: 5rem; font-weight: 300;">Soporte Técnico de Alta Disponibilidad</p>
 
                 <div class="company-cards">
                     <div class="card" id="card-Euroconnect">
-                        <img src="https://cdn-icons-png.flaticon.com/512/2891/2891415.png" height="60">
-                        <span style="font-weight: 600; font-size: 1.2rem;">Euroconnect</span>
+                        <img src="https://cdn-icons-png.flaticon.com/512/2891/2891415.png" height="70">
+                        <span style="font-weight: 600; font-size: 1.3rem;">Euroconnect</span>
                     </div>
                     <div class="card" id="card-TI-Euromotors">
-                        <img src="https://cdn-icons-png.flaticon.com/512/3202/3202926.png" height="60">
-                        <span style="font-weight: 600; font-size: 1.2rem;">TI Euromotors</span>
+                        <img src="https://cdn-icons-png.flaticon.com/512/3202/3202926.png" height="70">
+                        <span style="font-weight: 600; font-size: 1.3rem;">TI Euromotors</span>
                     </div>
                     <div class="card" id="card-Mesa-de-Ayuda-SIS">
-                        <img src="https://cdn-icons-png.flaticon.com/512/1063/1063376.png" height="60">
-                        <span style="font-weight: 600; font-size: 1.2rem;">Mesa de Ayuda SIS</span>
+                        <img src="https://cdn-icons-png.flaticon.com/512/1063/1063376.png" height="70">
+                        <span style="font-weight: 600; font-size: 1.3rem;">Mesa de Ayuda SIS</span>
                     </div>
                 </div>
 
-                <div style="margin-top: 5rem;">
-                    <button style="display: flex; align-items: center; gap: 12px; margin: 0 auto; padding: 1rem 2.5rem; border: 1px solid #eee; background: white; border-radius: 15px; cursor: pointer; box-shadow: 0 5px 15px rgba(0,0,0,0.05); font-weight: 500;">
-                        <img src="https://www.gstatic.com/images/branding/product/1x/gsa_512dp.png" width="22">
-                        Acceder con Google Workspace
+                <div style="margin-top: 6rem;">
+                    <button style="display: flex; align-items: center; gap: 15px; margin: 0 auto; padding: 1.2rem 3rem; border: none; background: #1a1a1a; color: white; border-radius: 20px; cursor: pointer; box-shadow: 0 10px 30px rgba(0,0,0,0.1); font-weight: 600; transition: 0.3s;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
+                        <img src="https://www.gstatic.com/images/branding/product/1x/gsa_512dp.png" width="24">
+                        Google SSO Authentication
                     </button>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Interactive Robot -->
+    <!-- Interactive Hyper-Realistic Robot -->
     <div class="robot-section">
-        <div id="robot-bot" class="robot-container" onclick="toggleBubble()">
-            <img src="robot_3d_full.png" alt="Robot Assistant">
+        <div id="robot-bot" class="robot-container" onmousedown="startDrag(event)" onclick="handleBotClick(event)">
+            <div class="robot-hint">Arrastra para mover</div>
+            <img id="robot-img" src="robot_realistic.png" alt="Realistic 3D Robot Assistant">
         </div>
         <div id="bubble" class="robot-bubble" onclick="event.stopPropagation()">
-            <div class="bubble-header">🤖 Hola, ¿cómo te ayudo hoy?</div>
-            <div id="bot-reply" style="font-size: 0.95rem; margin-bottom: 22px; color: #444; line-height: 1.5;">Soy tu asistente inteligente. ¿Tienes algún problema técnico o quieres crear un ticket?</div>
+            <div class="bubble-header">✨ Asistente de Comando</div>
+            <div id="bot-reply" style="font-size: 1.05rem; margin-bottom: 25px; color: #333; line-height: 1.6; font-weight: 400;">Bienvenido al centro de soporte. ¿Necesitas ayuda especializada para generar un ticket hoy?</div>
             <div class="bubble-input">
-                <input type="text" id="bot-query" placeholder="Escribe tu consulta aquí..." onkeypress="if(event.key==='Enter') sendBotQuery()">
-                <button onclick="sendBotQuery()">➤</button>
+                <input type="text" id="bot-query" placeholder="Describe tu solicitud..." onkeypress="if(event.key==='Enter') sendBotQuery()">
+                <button onclick="sendBotQuery()">🚀</button>
             </div>
         </div>
     </div>
@@ -204,26 +177,26 @@
     <div id="admin-panel">
         <div class="admin-box">
             <span class="close-btn" onclick="closeAdmin()">✕</span>
-            <h2>Base de Conocimiento</h2>
+            <h2 style="font-weight: 600;">Sincronizar Inteligencia</h2>
             
             <div id="password-gate">
-                <p style="color: #666; margin-bottom: 1.5rem;">Ingresa la clave maestra para subir archivos</p>
-                <input type="password" id="admin-password" placeholder="••••••••">
+                <p style="color: #666; margin-bottom: 1.5rem; font-size: 0.9rem;">Acceso restringido para especialistas IT</p>
+                <input type="password" id="admin-password" placeholder="CLAVE MAESTRA">
             </div>
 
-            <p style="color: #888; font-size: 0.85rem; margin-bottom: 2rem;">El documento Word se replicará en tiempo real para todos los usuarios del sistema.</p>
+            <p style="color: #999; font-size: 0.8rem; margin-bottom: 2rem;">Los cambios en el manual afectarán el comportamiento del bot para toda la red.</p>
             
-            <div style="border: 2px dashed #0066ff33; padding: 3rem; border-radius: 20px; cursor: pointer; background: #f8fbff; transition: 0.3s;" 
-                 onmouseover="this.style.borderColor='#0066ff'" onmouseout="this.style.borderColor='#0066ff33'"
+            <div style="border: 2px dashed #0066ff22; padding: 3.5rem; border-radius: 24px; cursor: pointer; background: #fbfdff; transition: 0.3s;" 
+                 onmouseover="this.style.borderColor='#0066ff'; this.style.background='#f0f7ff'" onmouseout="this.style.borderColor='#0066ff22'; this.style.background='#fbfdff'"
                  onclick="document.getElementById('file-input').click()">
-                <div style="font-size: 2.5rem; margin-bottom: 10px;">📄</div>
-                <div style="font-weight: 500; color: #444;">Seleccionar archivo .docx</div>
+                <div style="font-size: 3rem; margin-bottom: 15px;">📡</div>
+                <div style="font-weight: 600; color: #1a1a1a;">Vincular Base Docx</div>
                 <input type="file" id="file-input" accept=".docx" style="display:none" onchange="handleFile(this)">
-                <div id="file-name" style="margin-top: 15px; font-size: 0.85rem; color: var(--primary); font-weight: 600;"></div>
+                <div id="file-name" style="margin-top: 20px; font-size: 0.9rem; color: var(--primary); font-weight: 700;"></div>
             </div>
 
-            <button onclick="uploadWord()" style="margin-top: 2.5rem; width: 100%; padding: 1.2rem; background: var(--primary); color: white; border: none; border-radius: 15px; font-weight: 600; cursor: pointer; box-shadow: 0 10px 20px rgba(0,102,255,0.25);">
-                Sincronizar Conocimiento Global
+            <button onclick="uploadWord()" style="margin-top: 3rem; width: 100%; padding: 1.4rem; background: linear-gradient(135deg, var(--primary), #0052cc); color: white; border: none; border-radius: 18px; font-weight: 700; cursor: pointer; box-shadow: 0 15px 30px rgba(0,102,255,0.3); text-transform: uppercase; letter-spacing: 1px;">
+                Actualizar Conocimiento Global
             </button>
         </div>
     </div>
@@ -232,14 +205,61 @@
         const API_URL = '/api';
         let loggedUser = null;
 
+        // Interactive Movable Robot Logic
+        let isDragging = false;
+        let startX, startY;
+        let rotY = 0, rotX = 0;
+        const robot = document.getElementById('robot-bot');
+
+        function startDrag(e) {
+            isDragging = true;
+            startX = e.clientX;
+            startY = e.clientY;
+            document.addEventListener('mousemove', onDrag);
+            document.addEventListener('mouseup', stopDrag);
+        }
+
+        function onDrag(e) {
+            if (!isDragging) return;
+            const deltaX = e.clientX - startX;
+            const deltaY = e.clientY - startY;
+            rotY += deltaX * 0.5;
+            rotX -= deltaY * 0.2;
+            robot.style.transform = `rotateY(${rotY}deg) rotateX(${rotX}deg)`;
+            startX = e.clientX;
+            startY = e.clientY;
+        }
+
+        function stopDrag() {
+            isDragging = false;
+            document.removeEventListener('mousemove', onDrag);
+            document.removeEventListener('mouseup', stopDrag);
+        }
+
+        function handleBotClick(e) {
+            // Prevent bubble from toggling if drag happened
+            if (Math.abs(rotY % 360) > 5 || Math.abs(rotX % 360) > 5) {
+                // Was likely a drag, but reset optionally?
+            }
+            toggleBubble();
+        }
+
+        // Mouse follow subtlety
+        document.addEventListener('mousemove', (e) => {
+            if (isDragging) return;
+            const x = (window.innerWidth / 2 - e.clientX) / 50;
+            const y = (window.innerHeight / 2 - e.clientY) / 50;
+            if (!robot.classList.contains('robot-pointing')) {
+                robot.style.transform = `rotateY(${-x}deg) rotateX(${y}deg)`;
+            }
+        });
 
         function toggleBubble() {
             const b = document.getElementById('bubble');
-            const robot = document.getElementById('robot-bot');
             const show = b.style.display !== 'block';
             b.style.display = show ? 'block' : 'none';
             if (show) {
-                document.getElementById('bot-reply').innerText = '¿Qué problema tienes hoy? Cuéntame y te ayudaré a crear un ticket.';
+                document.getElementById('bot-reply').innerHTML = 'Entendido. Estoy a tu disposición. <strong>¡Cuéntame tu problema para indicarte el camino correcto!</strong>';
                 document.getElementById('bot-query').focus();
             } else {
                 robot.classList.remove('robot-pointing');
@@ -325,7 +345,5 @@
             } catch (e) { alert('Error al procesar el archivo.'); }
         }
     </script>
-</body>
-</html>
 </body>
 </html>
