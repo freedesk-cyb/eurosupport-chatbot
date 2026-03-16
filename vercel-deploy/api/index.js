@@ -62,7 +62,17 @@ app.post('/api/chat', (req, res) => {
         }
     }
 
-    res.json({ reply: response });
+    // Suggest a company based on keywords
+    let suggestedCompany = null;
+    if (query.includes('euroconnect') || query.includes('camion') || query.includes('transporte') || query.includes('logistica')) {
+        suggestedCompany = 'Euroconnect';
+    } else if (query.includes('euromotors') || query.includes('carro') || query.includes('auto') || query.includes('motor')) {
+        suggestedCompany = 'TI Euromotors';
+    } else if (query.includes('sis') || query.includes('sistema') || query.includes('ayuda') || query.includes('ticket')) {
+        suggestedCompany = 'Mesa de Ayuda SIS';
+    }
+
+    res.json({ reply: response, suggestedCompany });
 });
 
 module.exports = app;

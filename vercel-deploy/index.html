@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EuroSupport | Asistente Inteligente</title>
+    <title>EuroSupport | Central de Ayuda</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600&display=swap" rel="stylesheet">
@@ -11,11 +11,11 @@
         :root {
             --primary: #0066ff;
             --accent: #00f2ff;
-            --bg: #050a15;
-            --glass: rgba(255, 255, 255, 0.05);
-            --glass-border: rgba(255, 255, 255, 0.1);
-            --text: #ffffff;
-            --text-dim: #a0a0a0;
+            --bg-light: #ffffff;
+            --text-dark: #333333;
+            --text-dim: #666666;
+            --border: #e0e0e0;
+            --highlight: rgba(0, 102, 255, 0.4);
         }
 
         * {
@@ -26,157 +26,159 @@
         }
 
         body {
-            background: var(--bg);
-            background-image: 
-                radial-gradient(circle at 20% 20%, rgba(0, 102, 255, 0.15) 0%, transparent 40%),
-                radial-gradient(circle at 80% 80%, rgba(0, 242, 255, 0.1) 0%, transparent 40%);
-            color: var(--text);
-            min-height: 100vh;
+            height: 100vh;
+            display: flex;
+            overflow: hidden;
+            background: #f8f9fa;
+        }
+
+        /* Left Panel - Image */
+        .left-panel {
+            width: 40%;
+            height: 100%;
+            background: linear-gradient(rgba(5, 10, 21, 0.4), rgba(5, 10, 21, 0.4)), 
+                        url('https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?auto=format&fit=crop&q=80&w=2000');
+            background-size: cover;
+            background-position: center;
+            position: relative;
+        }
+
+        /* Right Panel - Content */
+        .right-panel {
+            width: 60%;
+            display: flex;
+            position: relative;
+        }
+
+        .main-content {
+            flex: 1;
+            padding: 4rem 2rem;
             display: flex;
             flex-direction: column;
-            overflow: hidden;
-        }
-
-        /* Navbar */
-        nav {
-            padding: 1.5rem 2rem;
-            display: flex;
-            justify-content: space-between;
             align-items: center;
-            background: rgba(5, 10, 21, 0.8);
-            backdrop-filter: blur(10px);
-            border-bottom: 1px solid var(--glass-border);
-            z-index: 100;
+            justify-content: center;
+            background: white;
         }
 
-        .logo {
-            font-size: 1.5rem;
+        .logo-area {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .logo-text {
+            font-size: 2.5rem;
             font-weight: 600;
-            letter-spacing: 1px;
+            color: #1a1a1a;
             display: flex;
             align-items: center;
             gap: 0.5rem;
         }
 
-        .logo span {
+        .logo-text span {
+            font-weight: 300;
+            color: #555;
+        }
+
+        .help-icon {
+            font-size: 2rem;
+            color: #1a1a1a;
+            border: 2px solid #1a1a1a;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-left: 0.5rem;
+        }
+
+        .selection-prompt {
+            color: var(--primary);
+            font-size: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .company-cards {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 1.5rem;
+            max-width: 600px;
+        }
+
+        .card {
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.5rem;
+            width: 250px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1rem;
+            cursor: pointer;
+            transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            border-color: var(--primary);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.05);
+        }
+
+        .card.active {
+            border: 2px solid var(--primary);
+            box-shadow: 0 0 20px var(--highlight);
+        }
+
+        .card img {
+            height: 40px;
+            object-fit: contain;
+        }
+
+        .card span {
+            font-weight: 600;
+            font-size: 1rem;
             color: var(--primary);
         }
 
-        .nav-links {
+        .google-btn {
+            margin-top: 3rem;
             display: flex;
-            gap: 2rem;
-        }
-
-        .nav-links button {
-            background: none;
-            border: none;
-            color: var(--text-dim);
-            cursor: pointer;
-            font-size: 0.9rem;
-            transition: 0.3s;
-            position: relative;
-        }
-
-        .nav-links button.active {
-            color: var(--text);
-        }
-
-        .nav-links button.active::after {
-            content: '';
-            position: absolute;
-            bottom: -5px;
-            left: 0;
-            width: 100%;
-            height: 2px;
-            background: var(--primary);
-            border-radius: 2px;
-        }
-
-        /* Container */
-        main {
-            flex: 1;
-            display: flex;
-            justify-content: center;
             align-items: center;
-            padding: 2rem;
-            position: relative;
+            gap: 0.8rem;
+            padding: 0.8rem 2rem;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            background: white;
+            cursor: pointer;
+            font-weight: 500;
+            transition: 0.3s;
         }
 
-        .view-panel {
-            width: 100%;
-            max-width: 900px;
-            height: 700px;
-            background: var(--glass);
-            backdrop-filter: blur(20px);
-            border: 1px solid var(--glass-border);
-            border-radius: 24px;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-            display: none;
-            flex-direction: column;
-            animation: fadeIn 0.5s ease-out;
+        .google-btn:hover {
+            background: #f1f1f1;
         }
 
-        .view-panel.active {
+        /* Chat Sidebar */
+        .chat-sidebar {
+            width: 350px;
+            height: 100%;
+            border-left: 1px solid var(--border);
+            background: #fafafa;
             display: flex;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        /* Chat UI */
-        #chat-view {
-            overflow: hidden;
+            flex-direction: column;
         }
 
         .chat-header {
-            padding: 1.5rem 2rem;
-            border-bottom: 1px solid var(--glass-border);
+            padding: 1.5rem;
+            background: white;
+            border-bottom: 1px solid var(--border);
             display: flex;
             align-items: center;
             gap: 1rem;
-        }
-
-        .status-dot {
-            width: 10px;
-            height: 10px;
-            background: #00ff88;
-            border-radius: 50%;
-            box-shadow: 0 0 10px #00ff88;
-        }
-
-        .chat-messages {
-            flex: 1;
-            padding: 2rem;
-            overflow-y: auto;
-            display: flex;
-            flex-direction: column;
-            gap: 1.5rem;
-        }
-
-        .message {
-            max-width: 80%;
-            padding: 1rem 1.5rem;
-            border-radius: 18px;
-            line-height: 1.5;
-            font-size: 0.95rem;
-            animation: slideIn 0.3s ease-out;
-        }
-
-        @keyframes slideIn {
-            from { opacity: 0; transform: translateX(-10px); }
-            to { opacity: 1; transform: translateX(0); }
-        }
-
-        .message.bot {
-            align-self: flex-start;
-            background: var(--glass);
-            border: 1px solid var(--glass-border);
-            border-bottom-left-radius: 4px;
-            display: flex;
-            flex-direction: column;
-            gap: 0.8rem;
         }
 
         .bot-avatar {
@@ -187,285 +189,183 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            font-size: 1.2rem;
-            margin-bottom: 0.5rem;
-            border: 2px solid var(--accent);
-            box-shadow: 0 0 10px var(--primary);
+            font-size: 1.5rem;
         }
 
-        .options-container {
+        .chat-messages {
+            flex: 1;
+            padding: 1rem;
+            overflow-y: auto;
             display: flex;
-            flex-wrap: wrap;
-            gap: 0.8rem;
-            margin-top: 0.5rem;
+            flex-direction: column;
+            gap: 1rem;
         }
 
-        .option-btn {
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid var(--glass-border);
-            border-radius: 20px;
-            padding: 0.5rem 1rem;
-            color: var(--text);
-            cursor: pointer;
-            font-size: 0.85rem;
-            transition: 0.3s;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
+        .message {
+            max-width: 85%;
+            padding: 0.8rem 1rem;
+            border-radius: 12px;
+            font-size: 0.9rem;
+            line-height: 1.4;
         }
 
-        .option-btn:hover {
-            background: var(--primary);
-            border-color: var(--accent);
-            transform: translateY(-2px);
+        .message.bot {
+            align-self: flex-start;
+            background: white;
+            border: 1px solid var(--border);
+            border-bottom-left-radius: 2px;
         }
 
         .message.user {
             align-self: flex-end;
             background: var(--primary);
             color: white;
-            border-bottom-right-radius: 4px;
+            border-bottom-right-radius: 2px;
         }
 
-        .chat-input-area {
-            padding: 1.5rem 2rem;
-            border-top: 1px solid var(--glass-border);
+        .chat-input {
+            padding: 1rem;
+            background: white;
+            border-top: 1px solid var(--border);
             display: flex;
-            gap: 1rem;
+            gap: 0.5rem;
         }
 
-        input[type="text"] {
+        .chat-input input {
             flex: 1;
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid var(--glass-border);
-            border-radius: 12px;
-            padding: 0.8rem 1.2rem;
-            color: white;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 0.6rem 1rem;
             outline: none;
-            transition: 0.3s;
         }
 
-        input[type="text"]:focus {
-            border-color: var(--primary);
-            background: rgba(255, 255, 255, 0.1);
-        }
-
-        .send-btn {
+        .chat-input button {
             background: var(--primary);
+            color: white;
             border: none;
-            border-radius: 12px;
-            width: 45px;
-            height: 45px;
+            border-radius: 8px;
+            padding: 0 1rem;
             cursor: pointer;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            transition: 0.3s;
         }
 
-        .send-btn:hover {
-            transform: scale(1.05);
-            background: var(--accent);
+        /* Admin Trigger */
+        .admin-trigger {
+            position: absolute;
+            bottom: 1rem;
+            left: 1rem;
+            font-size: 0.8rem;
+            color: #999;
+            cursor: pointer;
+            text-decoration: underline;
         }
 
-        /* Admin UI */
-        .admin-content {
-            padding: 3rem;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
+        /* Modals */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
             height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 2rem;
+            border-radius: 16px;
+            width: 400px;
             text-align: center;
         }
 
-        .upload-card {
-            width: 100%;
-            max-width: 400px;
-            padding: 2.5rem;
-            background: rgba(255, 255, 255, 0.03);
-            border: 2px dashed var(--glass-border);
-            border-radius: 20px;
-            transition: 0.3s;
+        .upload-area {
+            border: 2px dashed var(--border);
+            padding: 2rem;
+            margin: 1.5rem 0;
+            border-radius: 12px;
             cursor: pointer;
         }
 
-        .upload-card:hover {
+        .upload-area:hover {
             border-color: var(--primary);
-            background: rgba(0, 102, 255, 0.05);
-        }
-
-        .upload-icon {
-            font-size: 3rem;
-            margin-bottom: 1rem;
-            display: block;
-        }
-
-        .upload-btn {
-            margin-top: 2rem;
-            padding: 0.8rem 2rem;
-            background: var(--primary);
-            border: none;
-            border-radius: 10px;
-            color: white;
-            font-weight: 600;
-            cursor: pointer;
-            transition: 0.3s;
-        }
-
-        .upload-btn:hover {
-            background: var(--accent);
-            box-shadow: 0 0 20px var(--primary);
-        }
-
-        #file-info {
-            margin-top: 1rem;
-            font-size: 0.85rem;
-            color: var(--text-dim);
-        }
-
-        /* Notifications */
-        .toast {
-            position: fixed;
-            bottom: 2rem;
-            right: 2rem;
-            padding: 1rem 2rem;
-            background: var(--primary);
-            border-radius: 10px;
-            color: white;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-            transform: translateY(150%);
-            transition: 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        }
-
-        .toast.show {
-            transform: translateY(0);
-        }
-
-        /* Scrollbar */
-        ::-webkit-scrollbar {
-            width: 6px;
-        }
-        ::-webkit-scrollbar-track {
-            background: transparent;
-        }
-        ::-webkit-scrollbar-thumb {
-            background: var(--glass-border);
-            border-radius: 10px;
         }
     </style>
 </head>
 <body>
 
-    <nav>
-        <div class="logo">EURO<span>SUPPORT</span></div>
-        <div class="nav-links">
-            <button id="nav-chat" class="active" onclick="switchView('chat')">Chatbot</button>
-            <button id="nav-admin" onclick="switchView('admin')">Administrador</button>
-        </div>
-    </nav>
+    <div class="left-panel"></div>
 
-    <main>
-        <!-- Chat View -->
-        <div id="chat-view" class="view-panel active">
+    <div class="right-panel">
+        <div class="main-content">
+            <div class="logo-area">
+                <div class="logo-text">Euro<span>Support</span> <div class="help-icon">?</div></div>
+            </div>
+
+            <p class="selection-prompt">Seleccione una empresa para iniciar sesión:</p>
+
+            <div class="company-cards">
+                <div class="card" id="card-Euroconnect">
+                    <img src="https://cdn-icons-png.flaticon.com/512/2891/2891415.png" alt="Euroconnect">
+                    <span>Euroconnect</span>
+                </div>
+                <div class="card" id="card-Euromotors">
+                    <img src="https://cdn-icons-png.flaticon.com/512/3202/3202926.png" alt="TI Euromotors">
+                    <span>TI Euromotors</span>
+                </div>
+                <div class="card" id="card-SIS">
+                    <img src="https://cdn-icons-png.flaticon.com/512/1063/1063376.png" alt="SIS">
+                    <span>Mesa de Ayuda SIS</span>
+                </div>
+            </div>
+
+            <button class="google-btn">
+                <img src="https://www.gstatic.com/images/branding/product/1x/gsa_512dp.png" width="20" alt="Google">
+                Sign in with Google
+            </button>
+
+            <div class="admin-trigger" onclick="toggleAdmin()">Panel Administrador</div>
+        </div>
+
+        <div class="chat-sidebar">
             <div class="chat-header">
-                <div class="status-dot"></div>
+                <div class="bot-avatar">🤖</div>
                 <div>
-                    <h3 style="font-size: 1rem;">Asistente Virtual</h3>
-                    <p style="font-size: 0.75rem; color: var(--text-dim);">En línea • Listo para ayudarte</p>
+                    <h3 style="font-size: 0.9rem;">Asistente Virtual</h3>
+                    <p style="font-size: 0.7rem; color: #44ff44;">● En línea</p>
                 </div>
             </div>
             <div class="chat-messages" id="chat-messages">
                 <div class="message bot">
-                    <div class="bot-avatar">🤖</div>
-                    <div>¡Hola! Soy tu asistente de **EuroSupport**. Selecciona una de las siguientes opciones para guiarte mejor:</div>
-                    <div class="options-container">
-                        <button class="option-btn" onclick="selectOption('Euroconnect')">🏢 Euroconnect</button>
-                        <button class="option-btn" onclick="selectOption('TI Euromotors')">🚗 TI Euromotors</button>
-                        <button class="option-btn" onclick="selectOption('Mesa de Ayuda SIS')">🛠️ Mesa de Ayuda SIS</button>
-                    </div>
+                    ¡Hola! Soy tu asistente de EuroSupport. ¿Tienes dudas sobre dónde ingresar? Pregúntame y te ayudaré a elegir.
                 </div>
             </div>
-            <div class="chat-input-area">
-                <input type="text" id="user-input" placeholder="Escribe tu problema aquí..." onkeypress="if(event.key === 'Enter') sendMessage()">
-                <button class="send-btn" onclick="sendMessage()">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
-                </button>
+            <div class="chat-input">
+                <input type="text" id="user-input" placeholder="Pregunta algo..." onkeypress="if(event.key === 'Enter') sendMessage()">
+                <button onclick="sendMessage()">➤</button>
             </div>
         </div>
+    </div>
 
-        <!-- Admin View -->
-        <div id="admin-view" class="view-panel">
-            <div class="admin-content">
-                <h2 style="margin-bottom: 1rem;">Base de Conocimientos</h2>
-                <p style="color: var(--text-dim); margin-bottom: 2.5rem;">Carga un archivo Word (.docx) con las reglas de redirección para el chatbot.</p>
-                
-                <div class="upload-card" onclick="document.getElementById('file-input').click()">
-                    <span class="upload-icon">📄</span>
-                    <p style="font-weight: 500;">Haz clic o arrastra un archivo Word</p>
-                    <p style="font-size: 0.8rem; color: var(--text-dim);">Soporte para archivos .docx</p>
-                    <input type="file" id="file-input" accept=".docx" style="display: none;" onchange="handleFileSelect(this)">
-                    <div id="file-info">Ningún archivo seleccionado</div>
-                </div>
-
-                <button class="upload-btn" onclick="uploadDocument()">Subir Documento</button>
+    <!-- Admin Modal -->
+    <div id="admin-modal" class="modal">
+        <div class="modal-content">
+            <h3>Base de Conocimientos</h3>
+            <p style="font-size: 0.8rem; color: #666;">Sube un archivo Word para entrenar al bot.</p>
+            <div class="upload-area" onclick="document.getElementById('file-input').click()">
+                📄<br>Haz clic para subir .docx
+                <input type="file" id="file-input" accept=".docx" style="display: none;" onchange="handleFileSelect(this)">
+                <div id="file-info" style="font-size: 0.7rem; margin-top: 0.5rem;"></div>
             </div>
+            <button onclick="uploadDocument()" style="padding: 0.5rem 1rem; background: var(--primary); color: white; border: none; border-radius: 5px; cursor: pointer;">Subir</button>
+            <button onclick="toggleAdmin()" style="margin-left: 0.5rem; background: none; border: none; color: #999; cursor: pointer;">Cerrar</button>
         </div>
-    </main>
-
-    <div id="toast" class="toast">¡Archivo subido con éxito!</div>
+    </div>
 
     <script>
-        const API_URL = '/api'; // Relative for Vercel
-
-        function switchView(view) {
-            document.querySelectorAll('.view-panel').forEach(p => p.classList.remove('active'));
-            document.querySelectorAll('.nav-links button').forEach(b => b.classList.remove('active'));
-            
-            if (view === 'chat') {
-                document.getElementById('chat-view').classList.add('active');
-                document.getElementById('nav-chat').classList.add('active');
-            } else {
-                document.getElementById('admin-view').classList.add('active');
-                document.getElementById('nav-admin').classList.add('active');
-            }
-        }
-
-        let selectedFile = null;
-
-        function handleFileSelect(input) {
-            if (input.files.length > 0) {
-                selectedFile = input.files[0];
-                document.getElementById('file-info').textContent = selectedFile.name;
-            }
-        }
-
-        async function uploadDocument() {
-            if (!selectedFile) {
-                alert('Por favor, selecciona un archivo primero.');
-                return;
-            }
-
-            const formData = new FormData();
-            formData.append('document', selectedFile);
-
-            try {
-                const response = await fetch(`${API_URL}/upload`, {
-                    method: 'POST',
-                    body: formData
-                });
-                const data = await response.json();
-                
-                if (data.message) {
-                    showToast('Documento cargado correctamente');
-                    selectedFile = null;
-                    document.getElementById('file-info').textContent = 'Ningún archivo seleccionado';
-                }
-            } catch (error) {
-                console.error('Error:', error);
-                alert('Error al subir el archivo.');
-            }
-        }
+        const API_URL = '/api';
 
         async function sendMessage() {
             const input = document.getElementById('user-input');
@@ -482,56 +382,68 @@
                     body: JSON.stringify({ message })
                 });
                 const data = await response.json();
+                
                 addMessage(data.reply, 'bot');
+                
+                if (data.suggestedCompany) {
+                    highlightCard(data.suggestedCompany);
+                }
             } catch (error) {
-                addMessage('Lo siento, no pude contactar con el servidor. ¿Está el backend encendido?', 'bot');
+                addMessage('Lo siento, hubo un error de conexión.', 'bot');
             }
-        }
-
-        async function selectOption(option) {
-            addMessage(option, 'user');
-            
-            let reply = "";
-            if (option === 'Euroconnect') {
-                reply = "Has seleccionado **Euroconnect**. ¿En qué podemos ayudarte con los servicios de logística y transporte?";
-            } else if (option === 'TI Euromotors') {
-                reply = "Has seleccionado **TI Euromotors**. Por favor, indícanos tu problema técnico relacionado con automoción.";
-            } else if (option === 'Mesa de Ayuda SIS') {
-                reply = "Has seleccionado **Mesa de Ayuda SIS**. ¿Tienes algún problema con el sistema interno o reportes de usuario?";
-            }
-            
-            setTimeout(() => {
-                addMessage(reply, 'bot');
-            }, 500);
         }
 
         function addMessage(text, sender) {
             const container = document.getElementById('chat-messages');
             const msgDiv = document.createElement('div');
             msgDiv.className = `message ${sender}`;
-            
-            if (sender === 'bot') {
-                const avatar = document.createElement('div');
-                avatar.className = 'bot-avatar';
-                avatar.innerText = '🤖';
-                msgDiv.appendChild(avatar);
-                
-                const textDiv = document.createElement('div');
-                textDiv.innerHTML = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
-                msgDiv.appendChild(textDiv);
-            } else {
-                msgDiv.innerText = text;
-            }
-            
+            msgDiv.innerHTML = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
             container.appendChild(msgDiv);
             container.scrollTop = container.scrollHeight;
         }
 
-        function showToast(msg) {
-            const toast = document.getElementById('toast');
-            toast.innerText = msg;
-            toast.classList.add('show');
-            setTimeout(() => toast.classList.remove('show'), 3000);
+        function highlightCard(company) {
+            // Remove previous highlights
+            document.querySelectorAll('.card').forEach(c => c.classList.remove('active'));
+            
+            // Map suggested name to ID
+            let id = "";
+            if (company === 'Euroconnect') id = 'card-Euroconnect';
+            else if (company === 'TI Euromotors') id = 'card-Euromotors';
+            else if (company === 'Mesa de Ayuda SIS') id = 'card-SIS';
+            
+            if (id) {
+                const card = document.getElementById(id);
+                card.classList.add('active');
+                card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+        }
+
+        function toggleAdmin() {
+            const modal = document.getElementById('admin-modal');
+            modal.style.display = modal.style.display === 'flex' ? 'none' : 'flex';
+        }
+
+        let selectedFile = null;
+        function handleFileSelect(input) {
+            if (input.files.length > 0) {
+                selectedFile = input.files[0];
+                document.getElementById('file-info').textContent = selectedFile.name;
+            }
+        }
+
+        async function uploadDocument() {
+            if (!selectedFile) return alert('Selecciona un archivo.');
+            const formData = new FormData();
+            formData.append('document', selectedFile);
+            try {
+                const response = await fetch(`${API_URL}/upload`, { method: 'POST', body: formData });
+                const data = await response.json();
+                if (data.message) {
+                    alert('Conocimiento cargado.');
+                    toggleAdmin();
+                }
+            } catch (x) { alert('Error al subir.'); }
         }
     </script>
 </body>
