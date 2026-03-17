@@ -71,10 +71,21 @@
         .card img { width: 100%; height: auto; object-fit: contain; }
         
         .card span { 
-            font-weight: 500; font-size: 1.3rem; color: var(--primary);
+            font-weight: 500; font-size: 1.1rem; color: var(--primary);
             transition: var(--transition);
         }
         .card.highlight span { color: var(--border-active); }
+
+        /* Small Sync Card */
+        .card.sync-card {
+            padding: 1rem 1.5rem;
+            background: #f8f9fa;
+            border-style: dashed;
+            gap: 1rem;
+        }
+        .card.sync-card .card-img-container { width: 40px; font-size: 1.5rem; }
+        .card.sync-card span { font-size: 0.9rem; color: var(--text-light); }
+        .card.sync-card:hover { border-style: solid; border-color: var(--primary); background: #fff; }
 
         /* SSO Button Styling */
         .sso-container { margin-top: 2rem; }
@@ -87,29 +98,15 @@
         }
         .google-btn:hover { background: #f8f9fa; border-color: #ced4da; }
 
-        /* Unified Service Corner (Chat & Admin) */
-        .service-corner {
-            position: fixed; bottom: 30px; right: 30px; 
-            display: flex; flex-direction: column; gap: 15px; align-items: center;
-            z-index: 1500;
-        }
-
-        .knowledge-btn {
-            background: white; border: 1px solid var(--border-gray);
-            width: 50px; height: 50px; border-radius: 50%;
-            display: flex; align-items: center; justify-content: center;
-            cursor: pointer; color: var(--text-light); transition: var(--transition);
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-            font-size: 1.2rem;
-        }
-        .knowledge-btn:hover { transform: scale(1.1); color: var(--primary); border-color: var(--primary); }
-
+        /* Standard Floating Chatbot */
         .chat-fab {
+            position: fixed; bottom: 30px; right: 30px; 
             width: 70px; height: 70px;
             background: var(--primary); border: none; 
             border-radius: 50%; display: flex; align-items: center; justify-content: center;
             cursor: pointer; box-shadow: 0 8px 25px rgba(0,123,255,0.3);
             transition: var(--transition);
+            z-index: 1500;
             animation: float 3s ease-in-out infinite;
         }
         @keyframes float { 0% { transform: translateY(0); } 50% { transform: translateY(-5px); } 100% { transform: translateY(0); } }
@@ -140,12 +137,9 @@
 
     <!-- Corporate Content -->
     <div id="app-container">
-        <!-- Interactive Service Corner -->
-        <div class="service-corner">
-            <div class="knowledge-btn" onclick="openAdmin()" title="Portal de Conocimiento">⚡</div>
-            <div id="chat-fab" class="chat-fab" onclick="toggleChat()">
-                <img src="robot_character.png" alt="Chat Bot">
-            </div>
+        <!-- Floating Bot -->
+        <div id="chat-fab-main" class="chat-fab" onclick="toggleChat()">
+            <img src="robot_character.png" alt="Chat Bot">
         </div>
 
         <!-- Corporate Header -->
@@ -180,6 +174,12 @@
                     </div>
                     <span>MESA DE AYUDA SIS</span>
                 </div>
+
+                <!-- Integrated Sync Card -->
+                <div class="card sync-card" id="admin-sync-trigger" onclick="openAdmin()">
+                    <div class="card-img-container">⚡</div>
+                    <span>Sincronizar Inteligencia</span>
+                </div>
             </div>
 
             <!-- SSO Button -->
@@ -192,10 +192,8 @@
         </div>
     </div>
 
-    <!-- Classic Professional Chatbot Widget -->
-    <div id="chat-fab" class="chat-fab" onclick="toggleChat()">
-        <img src="robot_character.png" alt="Chat Bot">
-    </div>
+    <!-- Bot Logic (Standard Bubble) -->
+    <!-- Removed duplicate chat-fab from template bottom -->
 
     <div id="chat-window" class="chat-window">
         <div class="chat-header">
@@ -334,13 +332,6 @@
                 }
             } catch (e) { alert('Error al procesar el archivo.'); }
         }
-        // Clock HUD
-        function updateClock() {
-            const now = new Date();
-            document.getElementById('current-time').innerText = now.toLocaleTimeString('en-US', { hour12: false });
-        }
-        setInterval(updateClock, 1000);
-        updateClock();
     </script>
 </body>
 </html>
