@@ -11,8 +11,8 @@ app.use(express.json());
 
 // We use NATIVE FETCH to call Gemini REST API directly (no SDK, avoids v1beta bug)
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY || "";
-// Using v1 (stable) endpoint directly
-const GEMINI_URL = `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`;
+// Using v1beta endpoint with gemini-2.0-flash (current stable model)
+const GEMINI_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_API_KEY}`;
 
 console.log("SYSTEM: EuroSupport AI v2.0.0 (Direct REST API Mode)");
 
