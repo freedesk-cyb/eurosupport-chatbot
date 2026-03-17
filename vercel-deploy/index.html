@@ -23,7 +23,10 @@
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { 
-            height: 100vh; background: var(--bg-body); overflow-x: hidden; 
+            height: 100vh; 
+            background: linear-gradient(rgba(255, 255, 255, 0.92), rgba(255, 255, 255, 0.85)), url('it_bg.png');
+            background-size: cover; background-position: center;
+            overflow-x: hidden; 
             font-family: 'Inter', sans-serif; color: var(--text-main);
         }
 
@@ -84,25 +87,42 @@
         }
         .google-btn:hover { background: #f8f9fa; border-color: #ced4da; }
 
-        /* Knowledge Access (Simplified) */
-        .knowledge-corner { position: fixed; top: 2rem; right: 2rem; }
+        /* Unified Service Corner (Chat & Admin) */
+        .service-corner {
+            position: fixed; bottom: 30px; right: 30px; 
+            display: flex; flex-direction: column; gap: 15px; align-items: center;
+            z-index: 1500;
+        }
+
         .knowledge-btn {
-            background: #f8f9fa; border: 1px solid var(--border-gray);
-            width: 45px; height: 45px; border-radius: 50%;
+            background: white; border: 1px solid var(--border-gray);
+            width: 50px; height: 50px; border-radius: 50%;
             display: flex; align-items: center; justify-content: center;
             cursor: pointer; color: var(--text-light); transition: var(--transition);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            font-size: 1.2rem;
         }
-        .knowledge-btn:hover { background: #e9ecef; color: var(--primary); }
+        .knowledge-btn:hover { transform: scale(1.1); color: var(--primary); border-color: var(--primary); }
 
-        /* Chat Widget Adjustments (Light Theme) */
         .chat-fab {
-            position: fixed; bottom: 30px; right: 30px; width: 60px; height: 60px;
-            background: var(--primary); border: none; box-shadow: 0 4px 15px rgba(0,123,255,0.3);
+            width: 70px; height: 70px;
+            background: var(--primary); border: none; 
+            border-radius: 50%; display: flex; align-items: center; justify-content: center;
+            cursor: pointer; box-shadow: 0 8px 25px rgba(0,123,255,0.3);
+            transition: var(--transition);
+            animation: float 3s ease-in-out infinite;
         }
+        @keyframes float { 0% { transform: translateY(0); } 50% { transform: translateY(-5px); } 100% { transform: translateY(0); } }
+        
+        .chat-fab:hover { transform: scale(1.05) rotate(5deg); box-shadow: 0 12px 30px rgba(0,123,255,0.5); }
+        .chat-fab img { width: 45px; height: 45px; object-fit: contain; }
+
         .chat-window {
-            bottom: 110px; right: 30px; background: #fff;
-            border-radius: 12px; border: 1px solid var(--border-gray);
-            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+            position: fixed; bottom: 120px; right: 30px; width: 400px; height: 580px;
+            background: #fff; border-radius: 12px; border: 1px solid var(--border-gray);
+            box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+            display: none; flex-direction: column; z-index: 1500;
+            overflow: hidden; animation: slideUp 0.3s ease-out;
         }
         .chat-header { background: #f8f9fa; color: var(--text-main); border-bottom: 1px solid var(--border-gray); }
         .chat-header span { color: var(--primary); }
@@ -118,11 +138,14 @@
 </head>
 <body>
 
-    <!-- App Layout -->
+    <!-- Corporate Content -->
     <div id="app-container">
-        <!-- Knowledge Portal Access -->
-        <div class="knowledge-corner">
+        <!-- Interactive Service Corner -->
+        <div class="service-corner">
             <div class="knowledge-btn" onclick="openAdmin()" title="Portal de Conocimiento">⚡</div>
+            <div id="chat-fab" class="chat-fab" onclick="toggleChat()">
+                <img src="robot_character.png" alt="Chat Bot">
+            </div>
         </div>
 
         <!-- Corporate Header -->
@@ -151,9 +174,9 @@
                     <span>TI Euromotors</span>
                 </div>
 
-                <div class="card" id="card-Soporte-SIS">
+                <div class="card" id="card-Mesa-de-Ayuda-SIS">
                     <div class="card-img-container">
-                        <img src="https://cdn-icons-png.flaticon.com/512/1063/1063376.png" alt="Soporte SIS">
+                        <img src="https://cdn-icons-png.flaticon.com/512/1063/1063376.png" alt="Mesa de Ayuda SIS">
                     </div>
                     <span>MESA DE AYUDA SIS</span>
                 </div>
