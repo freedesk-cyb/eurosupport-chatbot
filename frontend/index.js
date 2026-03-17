@@ -17,7 +17,7 @@ let model = null;
 
 if (apiKey) {
     genAI = new GoogleGenerativeAI(apiKey);
-    // Usamos gemini-1.5-flash, que es compatible con las versiones modernas del SDK
+    // Usamos gemini-1.5-flash que es el modelo más estable y rápido actualmente
     model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
     console.log("AI: Gemini Initialized (Model: gemini-1.5-flash)");
 } else {
