@@ -12,7 +12,7 @@ app.use(express.json());
 // Groq API Configuration
 const GROQ_API_KEY = process.env.GROQ_API_KEY || "";
 const GROQ_URL = "https://api.groq.com/openai/v1/chat/completions";
-const GROQ_MODEL = "llama3-8b-8192"; // Fast, free model from Groq
+const GROQ_MODEL = "llama-3.3-70b-versatile"; // Current stable model from Groq
 
 console.log("SYSTEM: EuroSupport AI v3.0.0 (Groq + Llama 3)");
 
