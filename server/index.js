@@ -51,27 +51,22 @@ app.post('/api/chat', async (req, res) => {
     // Fallback if AI is not configured
     if (!model) {
         return res.json({ 
-            reply: "El servicio de IA no está configurado (API Key faltante en Vercel). Por favor, contacta al administrador.", 
+            reply: "El servicio de IA no está configurado (API Key faltante). Por favor, configúrala en el panel de Vercel.", 
             suggestedCompany: null 
         });
     }
 
     try {
+        console.log("AI: Processing message...");
         const prompt = `
             Eres "Asistente EuroSupport". Responde en ESPAÑOL.
-            CONTEXTO DEL MANUAL:
-            ${globalKnowledgeBase || "El manual está actualmente vacío. Pide al usuario que suba las instrucciones en el panel de administración (icono de rayo)."}
-
+            CONTEXTO: ${globalKnowledgeBase || "Manual vacío."}
             REGLAS:
-            1. Si el manual tiene la respuesta, úsala. Si no, usa tu conocimiento general sobre IT de forma profesional.
-            2. Identifica el área del problema:
-               - Redes -> "Euroconnect"
-               - Mecánica/Vehículos -> "TI Euromotors"
-               - Software/Sistemas -> "Mesa de Ayuda SIS"
-            3. Responde estrictamente con este formato JSON:
-               { "reply": "...", "suggestedCompany": "Euroconnect" o "TI Euromotors" o "Mesa de Ayuda SIS" o null }
+            1. Usa el contexto para responder.
+            2. Áreas: Euroconnect (Red), TI Euromotors (Mecánica), Mesa de Ayuda SIS (Software).
+            3. Formato JSON: { "reply": "...", "suggestedCompany": "..." }
 
-            USUARIO: ${message}
+            MENSAJE: ${message}
         `;
 
         const result = await model.generateContent(prompt);
@@ -83,17 +78,19 @@ app.post('/api/chat', async (req, res) => {
 
         res.json(jsonResponse);
     } catch (error) {
-        console.error('AI Processing Error:', error);
+        console.error('AI Error:', error);
         
-        let errorMsg = "Hubo un error al conectar con Gemini.";
-        if (error.message) {
-            if (error.message.includes("API_KEY_INVALID")) errorMsg = "La API Key de Gemini no es válida. Por favor, revísala.";
-            else if (error.message.includes("quota")) errorMsg = "Has superado el límite de uso gratuito de Gemini.";
-            else errorMsg += " Detalle: " + error.message;
+        let detail = error.message || "Error desconocido";
+        let userMessage = "Lo siento, tengo un problema técnico al conectar con mi cerebro (Gemini).";
+        
+        if (detail.includes("404")) {
+            userMessage = "ERROR 404: Vercel sigue usando una versión antigua del sistema. Por favor, haz un 'Redeploy' en Vercel desmarcando 'Use existing build cache'.";
+        } else if (detail.includes("API_KEY_INVALID")) {
+            userMessage = "La API Key configurada no es válida.";
         }
 
         res.status(500).json({ 
-            reply: errorMsg, 
+            reply: userMessage + " Detalle: " + detail, 
             suggestedCompany: null 
         });
     }
