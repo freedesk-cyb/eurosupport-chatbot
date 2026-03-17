@@ -11,16 +11,20 @@ app.use(cors());
 app.use(express.json());
 
 // Initialize Gemini safely
-console.log("SYSTEM: EuroSupport AI v1.0.5 Starting...");
+console.log("SYSTEM: EuroSupport AI v1.1.0 Starting...");
 const apiKey = process.env.GEMINI_API_KEY;
 let genAI = null;
 let model = null;
 
 if (apiKey) {
-    genAI = new GoogleGenerativeAI(apiKey);
-    // Usamos gemini-1.5-flash que es el modelo más estable y rápido actualmente
-    model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
-    console.log("AI: Gemini Initialized (Model: gemini-1.5-flash)");
+    try {
+        genAI = new GoogleGenerativeAI(apiKey);
+        // Usamos el nombre de modelo más estándar
+        model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+        console.log("AI: Gemini Initialized (Model: gemini-1.5-flash) - v1.1.0");
+    } catch (e) {
+        console.error("AI: Initialization failed:", e);
+    }
 } else {
     console.error("AI: GEMINI_API_KEY is missing in environment variables");
 }
@@ -38,7 +42,7 @@ app.post('/api/upload', upload.single('document'), async (req, res) => {
         
         const result = await mammoth.extractRawText({ buffer: req.file.buffer });
         globalKnowledgeBase = result.value || "";
-        console.log("AI: Knowledge updated, length:", globalKnowledgeBase.length);
+        console.log("AI: Knowledge updated (v1.1.0)");
         res.json({ message: 'Conocimiento actualizado!', size: globalKnowledgeBase.length });
     } catch (error) {
         res.status(500).json({ error: 'Error al procesar documento.' });
@@ -49,25 +53,21 @@ app.post('/api/chat', async (req, res) => {
     const { message } = req.body;
     if (!message) return res.status(400).json({ error: 'Message required.' });
 
-    // Fallback if AI is not configured
     if (!model) {
         return res.json({ 
-            reply: "El servicio de IA no está configurado (API Key faltante). Por favor, configúrala en el panel de Vercel.", 
+            reply: "[v1.1.0] Error: La IA no está inicializada. Revisa la API Key en Vercel.", 
             suggestedCompany: null 
         });
     }
 
     try {
-        console.log("AI: Processing message...");
         const prompt = `
-            Eres "Asistente EuroSupport". Responde en ESPAÑOL.
-            CONTEXTO: ${globalKnowledgeBase || "Manual vacío."}
-            REGLAS:
-            1. Usa el contexto para responder.
-            2. Áreas: Euroconnect (Red), TI Euromotors (Mecánica), Mesa de Ayuda SIS (Software).
-            3. Formato JSON: { "reply": "...", "suggestedCompany": "..." }
-
-            MENSAJE: ${message}
+            Eres "Asistente EuroSupport" (v1.1.0). 
+            Contexto: ${globalKnowledgeBase || "Manual no cargado."}
+            Instrucciones: Responde en español usando el contexto.
+            Formato: JSON { "reply": "...", "suggestedCompany": "..." }
+            
+            Mensaje: ${message}
         `;
 
         const result = await model.generateContent(prompt);
@@ -79,19 +79,17 @@ app.post('/api/chat', async (req, res) => {
 
         res.json(jsonResponse);
     } catch (error) {
-        console.error('AI Error:', error);
+        console.error('AI Error (v1.1.0):', error);
         
-        let detail = error.message || "Error desconocido";
-        let userMessage = "Lo siento, tengo un problema técnico al conectar con mi cerebro (Gemini).";
+        let detail = error.message || "Unknown Error";
+        let userMessage = "[v1.1.0] Error persistente detectado.";
         
         if (detail.includes("404")) {
-            userMessage = "ERROR 404: Vercel sigue usando una versión antigua del sistema. Por favor, haz un 'Redeploy' en Vercel desmarcando 'Use existing build cache'.";
-        } else if (detail.includes("API_KEY_INVALID")) {
-            userMessage = "La API Key configurada no es válida.";
+            userMessage = "Vercel sigue ejecutando código antiguo. Por favor, asegúrate de hacer un 'Redeploy' con 'Purge build cache'.";
         }
 
         res.status(500).json({ 
-            reply: userMessage + " Detalle: " + detail, 
+            reply: `${userMessage}\nDetalle Técnico: ${detail}`, 
             suggestedCompany: null 
         });
     }
