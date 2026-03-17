@@ -1,6 +1,6 @@
 {
   "name": "eurosupport-chatbot",
-  "version": "1.0.1",
+  "version": "1.0.5",
   "scripts": {
     "start": "node api/index.js"
   },
