@@ -7,311 +7,164 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@200;300;400;600&family=Inter:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
     <style>
         :root {
-            --primary: #0088ff;
-            --accent: #00f2ff;
-            --bg-dark: #070b14; /* Slightly lighter professional slate */
-            --glass-bg: rgba(255, 255, 255, 0.04);
-            --glass-border: rgba(0, 242, 255, 0.25);
-            --text-main: #ffffff;
-            --text-dim: rgba(255, 255, 255, 0.7);
+            --primary: #007bff;
+            --bg-body: #ffffff;
+            --bg-card: #ffffff;
+            --text-main: #212529;
+            --text-light: #6c757d;
+            --border-gray: #dee2e6;
+            --border-active: #007bff;
+            --shadow-sm: 0 2px 4px rgba(0,0,0,0.05);
+            --transition: all 0.2s ease-in-out;
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { 
-            height: 100vh; background: var(--bg-dark); overflow: hidden; 
-            font-family: 'Outfit', sans-serif; color: var(--text-main);
+            height: 100vh; background: var(--bg-body); overflow-x: hidden; 
+            font-family: 'Inter', sans-serif; color: var(--text-main);
         }
 
-        /* App Layout (Split Screen) */
-        #app-container { display: flex; height: 100vh; width: 100%; flex-direction: row; }
-
-        .left-panel {
-            flex: 0 0 50%;
-            background: linear-gradient(135deg, rgba(2, 5, 10, 0.95), rgba(0, 25, 60, 0.7)), url('it_bg.png');
-            background-size: cover; background-position: center;
-            border-right: 1px solid var(--glass-border);
-            position: relative; overflow: hidden;
-            box-shadow: 20px 0 100px rgba(0,0,0,0.5);
-        }
-        .left-panel::before {
-            content: ''; position: absolute; inset: 0;
-            background-image: 
-                linear-gradient(var(--glass-border) 1px, transparent 1px),
-                linear-gradient(90deg, var(--glass-border) 1px, transparent 1px);
-            background-size: 60px 60px; pointer-events: none;
-            opacity: 0.1; transform: perspective(1000px) rotateX(10deg);
+        #app-container {
+            max-width: 1200px; margin: 0 auto; padding: 4rem 2rem;
+            display: flex; flex-direction: column; align-items: center;
         }
 
-        .right-panel {
-            flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center;
-            background: linear-gradient(135deg, #0a111f 0%, #05080f 100%); 
-            position: relative; padding: 2rem;
+        /* Corporate Header */
+        .corporate-header {
+            display: flex; align-items: center; gap: 15px; margin-bottom: 5rem;
         }
+        .header-logo { font-size: 3rem; font-weight: 400; color: #000; letter-spacing: -1px; }
+        .header-divider { font-size: 3rem; color: #000; font-weight: 300; }
+        .header-icon { width: 45px; height: 45px; }
 
-        /* HUD Elements */
-        .hud-header {
-            position: absolute; top: 0; left: 0; width: 100%; height: 100px;
-            padding: 0 4rem; display: flex; align-items: center; justify-content: space-between;
-            border-bottom: 1px solid rgba(255,255,255,0.08); z-index: 100;
-            background: linear-gradient(to bottom, rgba(0,0,0,0.3), transparent);
-        }
-        .header-title { 
-            position: absolute; left: 50%; transform: translateX(-50%);
-            color: var(--accent); font-size: 0.8rem; letter-spacing: 8px; 
-            text-transform: uppercase; font-weight: 300; white-space: nowrap;
-        }
-        .hud-status { display: flex; align-items: center; gap: 1.5rem; font-size: 0.7rem; letter-spacing: 2px; text-transform: uppercase; color: var(--accent); opacity: 0.8; }
-        .hud-point { width: 6px; height: 6px; background: var(--accent); border-radius: 50%; box-shadow: 0 0 10px var(--accent); animation: pulse 2s infinite; }
-        @keyframes pulse { 0% { opacity: 0.5; } 50% { opacity: 1; } 100% { opacity: 0.5; } }
+        .subtitle { color: var(--primary); font-weight: 500; margin-bottom: 2.5rem; font-size: 1.1rem; }
 
-        .hud-corner {
-            position: absolute; width: 40px; height: 40px;
-            border: 1px solid var(--glass-border); pointer-events: none;
-        }
-        .top-left { top: 20px; left: 20px; border-right: none; border-bottom: none; }
-        .top-right { top: 20px; right: 20px; border-left: none; border-bottom: none; }
-        .bottom-left { bottom: 20px; left: 20px; border-right: none; border-top: none; }
-        .bottom-right { bottom: 20px; right: 20px; border-left: none; border-top: none; }
-
-        /* Company Selection - Refined Alignment */
-        .selection-area { text-align: center; width: 100%; max-width: 1100px; z-index: 10; margin-top: 40px; }
+        /* Card System - Horizontal Style */
+        .selection-area { width: 100%; max-width: 800px; display: flex; flex-direction: column; align-items: center; }
         .company-cards { 
-            display: grid; 
-            grid-template-columns: repeat(3, 1fr); 
-            gap: 2rem; 
-            margin-top: 5rem;
-            width: 100%;
+            display: flex; flex-direction: column; gap: 1.5rem; width: 100%; margin-bottom: 4rem;
         }
         .card {
-            background: rgba(255, 255, 255, 0.02); 
-            border: 1px solid rgba(255, 255, 255, 0.1); 
-            border-radius: 4px; 
-            padding: 4rem 1rem; cursor: pointer; 
-            transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
-            display: flex; flex-direction: column; align-items: center; gap: 2.5rem;
-            backdrop-filter: blur(50px);
-            box-shadow: 0 20px 80px rgba(0,0,0,0.5);
-            position: relative;
+            background: var(--bg-card); 
+            border: 2px solid var(--border-gray); 
+            border-radius: 8px;
+            padding: 1.5rem 2.5rem; 
+            cursor: pointer; 
+            display: flex; align-items: center; gap: 2rem;
+            transition: var(--transition);
+            box-shadow: var(--shadow-sm);
         }
-        .card::after {
-            content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 3px;
-            background: var(--accent); transform: scaleX(0); transition: 0.4s; transform-origin: left;
+        .card:hover { border-color: #adb5bd; transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
+        
+        .card.highlight { 
+            border-color: var(--border-active); 
+            box-shadow: 0 0 0 1px var(--border-active);
         }
-        .card:hover::after { transform: scaleX(1); }
-        .card:hover { 
-            transform: translateY(-15px); 
-            background: rgba(255, 255, 255, 0.03);
-            border-color: var(--accent);
-            box-shadow: 0 40px 100px rgba(0, 242, 255, 0.1); 
-        }
-        .card img { transition: 0.4s; filter: brightness(0.9); }
-        .card:hover img { transform: translateY(-5px); filter: brightness(1.2) drop-shadow(0 0 20px var(--accent)); }
+
+        .card-img-container { width: 120px; display: flex; justify-content: center; align-items: center; }
+        .card img { width: 100%; height: auto; object-fit: contain; }
         
         .card span { 
-            font-weight: 300; font-size: 1.1rem; letter-spacing: 4px; 
-            text-transform: uppercase; color: var(--text-dim);
-            transition: 0.3s;
+            font-weight: 500; font-size: 1.3rem; color: var(--primary);
+            transition: var(--transition);
         }
-        .card:hover span { color: #fff; letter-spacing: 5px; }
+        .card.highlight span { color: var(--border-active); }
 
-        .card.highlight { 
-            border: 1px solid var(--accent); 
-            background: rgba(0, 242, 255, 0.04);
-            box-shadow: inset 0 0 30px rgba(0, 242, 255, 0.1), 0 0 60px rgba(0, 242, 255, 0.2); 
-            animation: activeScan 2s infinite alternate;
+        /* SSO Button Styling */
+        .sso-container { margin-top: 2rem; }
+        .google-btn {
+            display: flex; align-items: center; gap: 12px;
+            padding: 0.8rem 1.5rem; border: 1px solid var(--border-gray);
+            background: white; color: #444; border-radius: 4px;
+            cursor: pointer; font-size: 1.1rem; font-weight: 500;
+            transition: var(--transition);
         }
-        @keyframes activeScan { 0% { border-color: rgba(0, 242, 255, 0.3); } 100% { border-color: var(--accent); } }
+        .google-btn:hover { background: #f8f9fa; border-color: #ced4da; }
 
-        /* Classic Professional Chatbot Widget */
-        .chat-fab {
-            position: fixed; bottom: 40px; right: 40px; width: 70px; height: 70px;
-            background: linear-gradient(135deg, #00f2ff, #0066ff);
-            border-radius: 50%; display: flex; align-items: center; justify-content: center;
-            cursor: pointer; box-shadow: 0 10px 40px rgba(0, 242, 255, 0.4);
-            z-index: 1500; transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            border: 2px solid rgba(255,255,255,0.2);
-        }
-        .chat-fab:hover { transform: scale(1.1) rotate(5deg); box-shadow: 0 15px 50px rgba(0, 242, 255, 0.6); }
-        .chat-fab img { width: 45px; height: 45px; object-fit: contain; filter: drop-shadow(0 0 5px rgba(0,0,0,0.2)); }
-
-        .chat-window {
-            position: fixed; bottom: 120px; right: 40px; width: 420px; height: 600px;
-            background: rgba(10, 20, 40, 0.9); backdrop-filter: blur(30px);
-            border: 1px solid rgba(0, 242, 255, 0.3); border-radius: 24px;
-            box-shadow: 0 30px 100px rgba(0,0,0,0.8);
-            display: none; flex-direction: column; z-index: 1500;
-            overflow: hidden; animation: slideUp 0.5s cubic-bezier(0.19, 1, 0.22, 1);
-        }
-        @keyframes slideUp { from { transform: translateY(50px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-        
-        .chat-header {
-            padding: 1.5rem; background: rgba(0, 242, 255, 0.1);
-            display: flex; align-items: center; justify-content: space-between;
-            border-bottom: 1px solid rgba(0, 242, 255, 0.2);
-        }
-        .chat-header-info { display: flex; align-items: center; gap: 12px; }
-        .chat-header-info img { width: 35px; height: 35px; border-radius: 50%; background: #000; padding: 2px; border: 1px solid #00f2ff; }
-        .chat-header-info span { font-weight: 600; color: #00f2ff; letter-spacing: 1px; font-size: 0.9rem; text-transform: uppercase; }
-
-        .chat-messages {
-            flex: 1; overflow-y: auto; padding: 1.5rem; display: flex; flex-direction: column; gap: 1rem;
-            scrollbar-width: thin; scrollbar-color: #00f2ff transparent;
-        }
-        .message { max-width: 80%; padding: 1rem 1.2rem; border-radius: 18px; line-height: 1.5; font-size: 0.95rem; position: relative; }
-        .message.bot { 
-            align-self: flex-start; background: rgba(0, 242, 255, 0.05); color: #fff; 
-            border: 1px solid rgba(0, 242, 255, 0.2); border-bottom-left-radius: 4px;
-        }
-        .message.user { 
-            align-self: flex-end; background: linear-gradient(135deg, #0066ff, #0044cc); color: white;
-            border-bottom-right-radius: 4px;
-        }
-
-        .chat-input-area {
-            padding: 1.2rem; background: rgba(0,0,0,0.3); border-top: 1px solid rgba(0, 242, 255, 0.1);
-            display: flex; gap: 10px;
-        }
-        .chat-input-area input {
-            flex: 1; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
-            border-radius: 12px; padding: 0.8rem 1rem; color: #fff; outline: none; transition: 0.3s;
-        }
-        .chat-input-area input:focus { border-color: #00f2ff; background: rgba(255,255,255,0.1); }
-        .chat-input-area button {
-            background: #00f2ff; border: none; width: 45px; height: 45px; border-radius: 12px;
-            cursor: pointer; transition: 0.3s; display: flex; align-items: center; justify-content: center;
-        }
-        .chat-input-area button:hover { transform: scale(1.1); box-shadow: 0 0 20px rgba(0, 242, 255, 0.5); }
-        @keyframes popIn { 
-            from { transform: scale(0) translate(100px, 100px); opacity: 0; } 
-            to { transform: scale(1) translate(0, 0); opacity: 1; } 
-        }
-
-        .bubble-header { display: flex; align-items: center; gap: 15px; margin-bottom: 20px; color: var(--primary); font-weight: 700; font-size: 1.2rem; }
-        .bubble-input { display: flex; gap: 12px; background: #f4f7fa; padding: 8px; border-radius: 16px; border: 1px solid #eee; }
-        .bubble-input input { flex: 1; border: none; background: transparent; padding: 0.8rem; outline: none; font-size: 1rem; color: #333; }
-        .bubble-input button { background: linear-gradient(135deg, var(--primary), #0052cc); border: none; padding: 0 1.5rem; border-radius: 12px; color: white; cursor: pointer; transition: 0.3s; font-size: 1.1rem; }
-        .bubble-input button:hover { transform: scale(1.05); box-shadow: 0 5px 15px rgba(0,102,255,0.3); }
-
-        /* Knowledge Corner (Secured Terminal Button) */
-        .knowledge-corner {
-            position: fixed; top: 40px; right: 40px; z-index: 1000;
-        }
+        /* Knowledge Access (Simplified) */
+        .knowledge-corner { position: fixed; top: 2rem; right: 2rem; }
         .knowledge-btn {
-            background: #000;
-            color: #00f2ff; width: 65px; height: 65px; border-radius: 8px;
+            background: #f8f9fa; border: 1px solid var(--border-gray);
+            width: 45px; height: 45px; border-radius: 50%;
             display: flex; align-items: center; justify-content: center;
-            font-size: 1.8rem; cursor: pointer; box-shadow: 0 0 20px rgba(0, 242, 255, 0.2);
-            transition: 0.4s; border: 1px solid rgba(0, 242, 255, 0.3);
-            position: relative; overflow: hidden;
+            cursor: pointer; color: var(--text-light); transition: var(--transition);
         }
-        .knowledge-btn::after {
-            content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%;
-            background: linear-gradient(45deg, transparent, rgba(0, 242, 255, 0.1), transparent);
-            transform: rotate(45deg); animation: scanLine 3s infinite linear;
+        .knowledge-btn:hover { background: #e9ecef; color: var(--primary); }
+
+        /* Chat Widget Adjustments (Light Theme) */
+        .chat-fab {
+            position: fixed; bottom: 30px; right: 30px; width: 60px; height: 60px;
+            background: var(--primary); border: none; box-shadow: 0 4px 15px rgba(0,123,255,0.3);
         }
-        @keyframes scanLine { 0% { transform: translateY(-100%) rotate(45deg); } 100% { transform: translateY(100%) rotate(45deg); } }
-        .knowledge-btn:hover { transform: scale(1.1); box-shadow: 0 0 30px rgba(0, 242, 255, 0.5); border-color: #00f2ff; }
+        .chat-window {
+            bottom: 110px; right: 30px; background: #fff;
+            border-radius: 12px; border: 1px solid var(--border-gray);
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+        }
+        .chat-header { background: #f8f9fa; color: var(--text-main); border-bottom: 1px solid var(--border-gray); }
+        .chat-header span { color: var(--primary); }
+        .message.bot { background: #f0f4f8; color: #2c3e50; border: none; border-radius: 12px 12px 12px 4px; }
         
-        .knowledge-label {
-            position: absolute; right: 80px; top: 18px; background: rgba(0,0,0,0.8);
-            color: #00f2ff; padding: 6px 18px; border-radius: 4px; font-size: 0.75rem;
-            white-space: nowrap; opacity: 0; transition: 0.3s; pointer-events: none;
-            border-right: 3px solid #00f2ff; text-transform: uppercase; letter-spacing: 1px;
-            backdrop-filter: blur(5px);
-        }
-        .knowledge-corner:hover .knowledge-label { opacity: 1; right: 90px; }
-
-        /* Admin Section Overlay (Secured Room) */
-        #admin-panel {
-            position: fixed; inset: 0; background: rgba(0,2,10,0.96); z-index: 2000;
-            display: none; align-items: center; justify-content: center;
-            backdrop-filter: blur(25px);
-        }
-        .admin-box { 
-            background: #02050a; padding: 4rem; border-radius: 4px; width: 550px; 
-            text-align: center; position: relative;
-            border: 1px solid rgba(0, 242, 255, 0.2);
-            box-shadow: 0 0 100px rgba(0, 242, 255, 0.1);
-        }
-        .admin-box h2 { color: #00f2ff; margin-bottom: 2rem; font-size: 2rem; font-weight: 300; letter-spacing: 4px; text-transform: uppercase; }
-        .close-btn { position: absolute; top: 25px; right: 25px; cursor: pointer; font-size: 1.5rem; color: #333; transition: 0.3s; }
-        .close-btn:hover { color: #00f2ff; transform: rotate(90deg); }
-
-        #password-gate { margin-bottom: 2rem; }
-        #password-gate input { 
-            width: 100%; padding: 1.5rem; border: 1px solid rgba(0, 242, 255, 0.3); 
-            border-radius: 0; background: rgba(0,0,0,0.5); color: #00f2ff;
-            text-align: center; font-size: 1.5rem; letter-spacing: 12px;
-            font-family: monospace; outline: none; transition: 0.3s;
-        }
-        #password-gate input:focus { border-color: #00f2ff; box-shadow: 0 0 30px rgba(0, 242, 255, 0.3); }
+        /* Admin Panel Light */
+        #admin-panel { background: rgba(255,255,255,0.9); backdrop-filter: blur(10px); }
+        .admin-box { background: #fff; border: 1px solid var(--border-gray); box-shadow: 0 20px 60px rgba(0,0,0,0.1); border-radius: 12px; }
+        .admin-box h2 { color: var(--text-main); letter-spacing: 0; font-weight: 600; }
+        #password-gate input { background: #f8f9fa; border-color: var(--border-gray); color: #333; }
 
     </style>
 </head>
 <body>
 
-    <!-- Knowledge Upload Corner -->
-    <div class="knowledge-corner">
-        <div class="knowledge-label">Gestión de Conocimiento</div>
-        <div class="knowledge-btn" onclick="openAdmin()">⚡</div>
-    </div>
-
     <!-- App Layout -->
     <div id="app-container">
-        <div class="left-panel">
-            <div class="hud-corner top-left"></div>
-            <div class="hud-corner bottom-left"></div>
+        <!-- Knowledge Portal Access -->
+        <div class="knowledge-corner">
+            <div class="knowledge-btn" onclick="openAdmin()" title="Portal de Conocimiento">⚡</div>
         </div>
-        <div class="right-panel">
-            <div class="hud-header">
-                <div class="hud-status">
-                    <div class="hud-point"></div>
-                    <span>Status: Optimal</span>
-                    <span style="opacity: 0.2;">|</span>
-                    <span>Secure Env</span>
-                </div>
-                
-                <div class="header-title">Command Center</div>
 
-                <div class="hud-status">
-                    <span id="current-time" style="font-family: monospace; letter-spacing: 4px;">00:00:00</span>
+        <!-- Corporate Header -->
+        <header class="corporate-header">
+            <span class="header-logo">EuroSupport</span>
+            <span class="header-divider">|</span>
+            <img src="https://cdn-icons-png.flaticon.com/512/1063/1063376.png" class="header-icon" alt="Help">
+        </header>
+
+        <p class="subtitle">Seleccione una empresa para iniciar sesión:</p>
+
+        <!-- Selection Area -->
+        <div class="selection-area">
+            <div class="company-cards">
+                <div class="card" id="card-Euroconnect">
+                    <div class="card-img-container">
+                        <img src="https://cdn-icons-png.flaticon.com/512/2891/2891415.png" alt="Euroconnect">
+                    </div>
+                    <span>Euroconnect</span>
+                </div>
+
+                <div class="card highlight" id="card-TI-Euromotors">
+                    <div class="card-img-container">
+                        <img src="https://cdn-icons-png.flaticon.com/512/3202/3202926.png" alt="TI Euromotors">
+                    </div>
+                    <span>TI Euromotors</span>
+                </div>
+
+                <div class="card" id="card-Soporte-SIS">
+                    <div class="card-img-container">
+                        <img src="https://cdn-icons-png.flaticon.com/512/1063/1063376.png" alt="Soporte SIS">
+                    </div>
+                    <span>MESA DE AYUDA SIS</span>
                 </div>
             </div>
-            
-            <div class="hud-corner top-right"></div>
-            <div class="hud-corner bottom-right"></div>
 
-            <div class="selection-area">
-                <p style="color: var(--accent); font-size: 0.8rem; letter-spacing: 6px; text-transform: uppercase; margin-bottom: 1rem; font-weight: 300;">EuroSupport Command Center</p>
-                <h1 style="font-size: 4rem; margin-bottom: 1rem; letter-spacing: -1px; font-weight: 200; text-transform: uppercase; font-family: 'Inter', sans-serif;">Centro de Control</h1>
-                <div style="width: 50px; height: 1px; background: var(--accent); margin: 0 auto 4rem; opacity: 0.5;"></div>
-
-                <div class="company-cards">
-                    <div class="card" id="card-Euroconnect">
-                        <img src="https://cdn-icons-png.flaticon.com/512/2891/2891415.png" height="50">
-                        <span>Euroconnect</span>
-                    </div>
-                    <div class="card" id="card-TI-Euromotors">
-                        <img src="https://cdn-icons-png.flaticon.com/512/3202/3202926.png" height="50">
-                        <span>TI Euromotors</span>
-                    </div>
-                    <div class="card" id="card-Mesa-de-Ayuda-SIS">
-                        <img src="https://cdn-icons-png.flaticon.com/512/1063/1063376.png" height="50">
-                        <span>Soporte SIS</span>
-                    </div>
-                </div>
-
-                <div style="margin-top: 6rem;">
-                    <button style="background: transparent; border: 1px solid rgba(255,255,255,0.1); color: #fff; padding: 1.2rem 3rem; border-radius: 4px; display: flex; align-items: center; gap: 15px; margin: 0 auto; cursor: pointer; transition: 0.4s; font-size: 0.9rem; letter-spacing: 2px; text-transform: uppercase; font-weight: 300;" 
-                            onmouseover="this.style.borderColor='var(--accent)'; this.style.background='rgba(0,242,255,0.02)'" 
-                            onmouseout="this.style.borderColor='rgba(255,255,255,0.1)'; this.style.background='transparent'">
-                        <img src="https://www.gstatic.com/images/branding/product/1x/gsa_512dp.png" width="20" style="filter: grayscale(1);">
-                        SSO Authentication Required
-                    </button>
-                </div>
+            <!-- SSO Button -->
+            <div class="sso-container">
+                <button class="google-btn">
+                    <img src="https://www.gstatic.com/images/branding/product/1x/gsa_512dp.png" width="20" alt="Google">
+                    Sign in with Google
+                </button>
             </div>
         </div>
     </div>
