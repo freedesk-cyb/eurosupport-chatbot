@@ -11,6 +11,7 @@ app.use(cors());
 app.use(express.json());
 
 // Initialize Gemini safely
+console.log("SYSTEM: EuroSupport AI v1.0.1 Starting...");
 const apiKey = process.env.GEMINI_API_KEY;
 let genAI = null;
 let model = null;
