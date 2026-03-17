@@ -9,12 +9,12 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// We use NATIVE FETCH to call Gemini REST API directly (no SDK, avoids v1beta bug)
-const GEMINI_API_KEY = process.env.GEMINI_API_KEY || "";
-// Using v1beta endpoint with gemini-2.0-flash (current stable model)
-const GEMINI_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_API_KEY}`;
+// Groq API Configuration
+const GROQ_API_KEY = process.env.GROQ_API_KEY || "";
+const GROQ_URL = "https://api.groq.com/openai/v1/chat/completions";
+const GROQ_MODEL = "llama3-8b-8192"; // Fast, free model from Groq
 
-console.log("SYSTEM: EuroSupport AI v2.0.0 (Direct REST API Mode)");
+console.log("SYSTEM: EuroSupport AI v3.0.0 (Groq + Llama 3)");
 
 let globalKnowledgeBase = "";
 
@@ -38,53 +38,69 @@ app.post('/api/upload', upload.single('document'), async (req, res) => {
     }
 });
 
-// Chat Endpoint - Direct REST to Gemini v1 (stable)
+// Chat Endpoint - Powered by Groq (Llama 3)
 app.post('/api/chat', async (req, res) => {
     const { message } = req.body;
     if (!message) return res.status(400).json({ error: 'Message required.' });
 
-    if (!GEMINI_API_KEY) {
-        return res.json({ reply: "Falta la API Key de Gemini. Configúrala en Variables de Entorno de Vercel.", suggestedCompany: null });
+    if (!GROQ_API_KEY) {
+        return res.json({
+            reply: "Falta la API Key de Groq. Configúrala como 'GROQ_API_KEY' en las Variables de Entorno de Vercel.",
+            suggestedCompany: null
+        });
     }
 
-    const prompt = `
-        Eres "Asistente EuroSupport", un agente de soporte técnico corporativo profesional. Responde siempre en ESPAÑOL.
-        
-        BASE DE CONOCIMIENTO:
-        ${globalKnowledgeBase || "El manual aún no ha sido cargado. Usa tu conocimiento general de IT."}
-        
-        INSTRUCCIONES:
-        1. Responde de forma amable, profesional y concisa basándote en la base de conocimiento.
-        2. Si el problema es de red/internet/conectividad, el área es "Euroconnect".
-        3. Si el problema es de mecánica/vehículos/transporte, el área es "TI Euromotors".
-        4. Si el problema es de software/SIS/sistemas, el área es "Mesa de Ayuda SIS".
-        5. CRÍTICO: Responde SOLO con un objeto JSON válido, sin markdown, sin texto extra:
-           { "reply": "tu respuesta aquí", "suggestedCompany": "Euroconnect" }
-        
-        MENSAJE DEL USUARIO: ${message}
+    const systemPrompt = `
+        Eres "Asistente EuroSupport", un agente de soporte técnico corporativo amable y profesional. 
+        Responde SIEMPRE en español y de forma concisa.
+
+        BASE DE CONOCIMIENTO DEL MANUAL:
+        ${globalKnowledgeBase || "El manual no ha sido cargado. Usa tu conocimiento general de IT para ayudar."}
+
+        INSTRUCCIONES CRITICAS:
+        1. Usa la base de conocimiento anterior como tu fuente principal de respuestas.
+        2. Detecta el área del problema del usuario y asigna la empresa correcta:
+           - Problemas de red, internet, conectividad, VPN -> "Euroconnect"
+           - Problemas de vehículos, mecánica, talleres, motores -> "TI Euromotors"
+           - Problemas de software, sistemas, contraseñas, SIS, ERP -> "Mesa de Ayuda SIS"
+        3. Si no coincide con ningún área, devuelve null en suggestedCompany.
+        4. Responde SOLO y ÚNICAMENTE con un objeto JSON válido. Sin texto extra, sin markdown:
+           { "reply": "Tu respuesta profesional aquí", "suggestedCompany": "Euroconnect" }
     `;
 
     try {
-        const response = await fetch(GEMINI_URL, {
+        const response = await fetch(GROQ_URL, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${GROQ_API_KEY}`
+            },
             body: JSON.stringify({
-                contents: [{ parts: [{ text: prompt }] }],
-                generationConfig: { temperature: 0.7, maxOutputTokens: 512 }
+                model: GROQ_MODEL,
+                messages: [
+                    { role: "system", content: systemPrompt },
+                    { role: "user", content: message }
+                ],
+                temperature: 0.7,
+                max_tokens: 512,
+                response_format: { type: "json_object" }
             })
         });
 
         if (!response.ok) {
             const errText = await response.text();
-            console.error("Gemini API Error:", response.status, errText);
-            throw new Error(`Gemini responded with ${response.status}: ${errText}`);
+            throw new Error(`Groq API Error ${response.status}: ${errText}`);
         }
 
         const data = await response.json();
-        const text = data?.candidates?.[0]?.content?.parts?.[0]?.text || "";
+        const text = data?.choices?.[0]?.message?.content || "{}";
 
-        const jsonMatch = text.match(/\{[\s\S]*\}/);
-        const jsonResponse = jsonMatch ? JSON.parse(jsonMatch[0]) : { reply: text, suggestedCompany: null };
+        let jsonResponse;
+        try {
+            jsonResponse = JSON.parse(text);
+        } catch {
+            jsonResponse = { reply: text, suggestedCompany: null };
+        }
 
         res.json(jsonResponse);
     } catch (error) {
