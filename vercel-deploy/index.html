@@ -14,9 +14,9 @@
             --primary-light: rgba(0, 123, 255, 0.1);
             --bg-body: #ffffff;
             --bg-card: #ffffff;
-            --text-main: #212529;
-            --text-light: #6c757d;
-            --border-gray: #dee2e6;
+            --text-main: #1a202c; /* Sharper, deeper corporate gray */
+            --text-light: #718096;
+            --border-gray: #e2e8f0;
             --border-active: #007bff;
             --shadow-sm: 0 4px 10px rgba(0,0,0,0.05);
             --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -106,16 +106,20 @@
         }
         .card.sync-card:hover { border-style: solid; background: #fff; }
 
-        /* SSO Button Styling */
-        .sso-container { margin-top: 2rem; }
-        .google-btn {
-            display: flex; align-items: center; gap: 12px;
-            padding: 0.8rem 1.5rem; border: 1px solid var(--border-gray);
-            background: white; color: #444; border-radius: 4px;
-            cursor: pointer; font-size: 1.1rem; font-weight: 500;
-            transition: var(--transition);
+        /* SSO Button Styling - Corner Position */
+        .sso-container { 
+            position: absolute; top: 40px; right: 40px; 
+            z-index: 1000;
         }
-        .google-btn:hover { background: #f8f9fa; border-color: #ced4da; }
+        .google-btn {
+            display: flex; align-items: center; gap: 10px;
+            padding: 0.6rem 1.2rem; border: 1px solid var(--border-gray);
+            background: white; color: #4a5568; border-radius: 6px;
+            cursor: pointer; font-size: 0.95rem; font-weight: 600;
+            transition: var(--transition);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+        .google-btn:hover { background: #f7fafc; border-color: #cbd5e0; transform: translateY(-1px); box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
 
         /* Premium Glassmorphism Chatbot */
         .chat-fab {
@@ -128,9 +132,9 @@
         }
         .chat-fab:hover { transform: scale(1.05) rotate(5deg); box-shadow: 0 12px 40px rgba(0,123,255,0.6); }
         .chat-fab img { 
-            width: 48px; height: 48px; object-fit: contain; 
-            background: rgba(255,255,255,0.9); border-radius: 50%; padding: 4px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            width: 50px; height: 50px; object-fit: contain; 
+            background: white; border-radius: 50%; padding: 2px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
         }
 
         .chat-window {
@@ -149,7 +153,7 @@
         }
         .chat-header-info { display: flex; align-items: center; gap: 12px; }
         .chat-header-info img { 
-            width: 36px; height: 36px; border-radius: 50%; 
+            width: 38px; height: 38px; border-radius: 50%; 
             background: white; border: 1px solid rgba(0,0,0,0.05); padding: 2px;
         }
         .chat-header-info span { font-weight: 600; color: var(--text-main); font-size: 0.95rem; }
@@ -219,7 +223,7 @@
     <div id="app-container">
         <!-- Floating Bot -->
         <div id="chat-fab-main" class="chat-fab" onclick="toggleChat()">
-            <img src="robot_character.png" alt="Chat Bot">
+            <img src="lena_bot.svg" alt="Chat Bot">
         </div>
 
         <!-- Corporate Header -->
@@ -233,6 +237,14 @@
 
         <!-- Selection Area -->
         <div class="selection-area">
+            <!-- SSO Button Corner -->
+            <div class="sso-container">
+                <button class="google-btn">
+                    <img src="https://www.gstatic.com/images/branding/product/1x/gsa_512dp.png" width="18" alt="Google">
+                    Sign in with Google
+                </button>
+            </div>
+
             <div class="company-cards">
                 <div class="card" id="card-Euroconnect">
                     <div class="card-img-container">
@@ -262,13 +274,7 @@
                 </div>
             </div>
 
-            <!-- SSO Button -->
-            <div class="sso-container">
-                <button class="google-btn">
-                    <img src="https://www.gstatic.com/images/branding/product/1x/gsa_512dp.png" width="20" alt="Google">
-                    Sign in with Google
-                </button>
-            </div>
+            <!-- SSO Button removed from here -->
         </div>
     </div>
 
@@ -278,7 +284,7 @@
     <div id="chat-window" class="chat-window">
         <div class="chat-header">
             <div class="chat-header-info">
-                <img src="robot_character.png" alt="Bot Avatar">
+                <img src="lena_bot.svg" alt="Bot Avatar">
                 <span>Asistente EuroSupport</span>
             </div>
             <span onclick="toggleChat()" style="cursor:pointer; color: rgba(255,255,255,0.5); font-size: 1.2rem;">✕</span>
