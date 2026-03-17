@@ -83,8 +83,16 @@ app.post('/api/chat', async (req, res) => {
         res.json(jsonResponse);
     } catch (error) {
         console.error('AI Processing Error:', error);
+        
+        let errorMsg = "Hubo un error al conectar con Gemini.";
+        if (error.message) {
+            if (error.message.includes("API_KEY_INVALID")) errorMsg = "La API Key de Gemini no es válida. Por favor, revísala.";
+            else if (error.message.includes("quota")) errorMsg = "Has superado el límite de uso gratuito de Gemini.";
+            else errorMsg += " Detalle: " + error.message;
+        }
+
         res.status(500).json({ 
-            reply: "Hubo un error al conectar con Gemini. Verifica que tu API Key sea válida y no tenga restricciones de cuota.", 
+            reply: errorMsg, 
             suggestedCompany: null 
         });
     }
