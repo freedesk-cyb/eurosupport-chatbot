@@ -7,100 +7,111 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@200;300;400;600&family=Inter:wght@400;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --primary: #0066ff;
+            --primary: #0088ff;
             --accent: #00f2ff;
-            --bg-light: #f8f9fa;
-            --text-dark: #1a1a1a;
-            --border: #e0e0e0;
-            --shadow: 0 10px 30px rgba(0,0,0,0.1);
+            --bg-dark: #02050a;
+            --glass-bg: rgba(255, 255, 255, 0.03);
+            --glass-border: rgba(0, 242, 255, 0.2);
+            --text-main: #ffffff;
+            --text-dim: rgba(255, 255, 255, 0.6);
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Outfit', sans-serif; }
-        body { height: 100vh; background: var(--bg-light); overflow: hidden; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            height: 100vh; background: var(--bg-dark); overflow: hidden; 
+            font-family: 'Outfit', sans-serif; color: var(--text-main);
+        }
 
         /* App Layout (Split Screen) */
         #app-container { display: flex; height: 100vh; width: 100%; flex-direction: row; }
 
         .left-panel {
-            flex: 0 0 45%;
-            background: linear-gradient(135deg, rgba(0, 5, 20, 0.9), rgba(0, 30, 100, 0.6)), url('it_bg.png');
+            flex: 0 0 50%;
+            background: linear-gradient(135deg, rgba(2, 5, 10, 0.95), rgba(0, 25, 60, 0.7)), url('it_bg.png');
             background-size: cover; background-position: center;
-            border-right: 1px solid rgba(0, 242, 255, 0.2);
+            border-right: 1px solid var(--glass-border);
             position: relative; overflow: hidden;
+            box-shadow: 20px 0 100px rgba(0,0,0,0.5);
         }
         .left-panel::before {
             content: ''; position: absolute; inset: 0;
             background-image: 
-                linear-gradient(rgba(0, 242, 255, 0.05) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(0, 242, 255, 0.05) 1px, transparent 1px);
-            background-size: 50px 50px;
-            animation: moveGrid 20s linear infinite;
+                linear-gradient(var(--glass-border) 1px, transparent 1px),
+                linear-gradient(90deg, var(--glass-border) 1px, transparent 1px);
+            background-size: 60px 60px; pointer-events: none;
+            opacity: 0.1; transform: perspective(1000px) rotateX(10deg);
         }
-        @keyframes moveGrid { 0% { transform: translateY(0); } 100% { transform: translateY(50px); } }
 
         .right-panel {
             flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center;
-            background: radial-gradient(circle at center, #0a1020 0%, #02050a 100%); 
-            position: relative; padding: 2rem; color: #fff;
-        }
-        .right-panel::after {
-            content: ''; position: absolute; inset: 0;
-            background-image: 
-                linear-gradient(rgba(0, 242, 255, 0.03) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(0, 242, 255, 0.03) 1px, transparent 1px);
-            background-size: 100px 100px;
-            pointer-events: none; transform: perspective(1000px) rotateX(60deg);
-            transform-origin: bottom; opacity: 0.5;
+            background: radial-gradient(circle at center, #0a1525 0%, #02050a 100%); 
+            position: relative; padding: 2rem;
         }
 
-        /* Company Selection - High Clarity Futuristic */
-        .selection-area { text-align: center; width: 100%; max-width: 900px; z-index: 10; }
-        .company-cards { display: flex; flex-wrap: wrap; justify-content: center; gap: 2.5rem; margin-top: 4rem; }
+        /* HUD Elements */
+        .hud-header {
+            position: absolute; top: 0; left: 0; width: 100%; height: 80px;
+            padding: 0 3rem; display: flex; align-items: center; justify-content: space-between;
+            border-bottom: 1px solid rgba(255,255,255,0.05); z-index: 100;
+        }
+        .hud-status { display: flex; align-items: center; gap: 2rem; font-size: 0.7rem; letter-spacing: 2px; text-transform: uppercase; color: var(--accent); opacity: 0.7; }
+        .hud-point { width: 6px; height: 6px; background: var(--accent); border-radius: 50%; box-shadow: 0 0 10px var(--accent); animation: pulse 2s infinite; }
+        @keyframes pulse { 0% { opacity: 0.5; } 50% { opacity: 1; } 100% { opacity: 0.5; } }
+
+        .hud-corner {
+            position: absolute; width: 40px; height: 40px;
+            border: 1px solid var(--glass-border); pointer-events: none;
+        }
+        .top-left { top: 20px; left: 20px; border-right: none; border-bottom: none; }
+        .top-right { top: 20px; right: 20px; border-left: none; border-bottom: none; }
+        .bottom-left { bottom: 20px; left: 20px; border-right: none; border-top: none; }
+        .bottom-right { bottom: 20px; right: 20px; border-left: none; border-top: none; }
+
+        /* Company Selection - High Clarity */
+        .selection-area { text-align: center; width: 100%; max-width: 1000px; z-index: 10; padding-top: 40px; }
+        .company-cards { display: flex; flex-wrap: wrap; justify-content: center; gap: 3rem; margin-top: 5rem; }
         .card {
-            background: rgba(255, 255, 255, 0.02); 
-            border: 1px solid rgba(0, 242, 255, 0.2); 
-            border-radius: 16px;
-            padding: 3rem 2rem; width: 260px; cursor: pointer; 
-            transition: all 0.5s cubic-bezier(0.23, 1, 0.32, 1);
-            display: flex; flex-direction: column; align-items: center; gap: 2rem;
-            backdrop-filter: blur(20px);
-            box-shadow: 0 10px 40px rgba(0,0,0,0.4);
-            position: relative; overflow: hidden;
+            background: rgba(255, 255, 255, 0.015); 
+            border: 1px solid rgba(255, 255, 255, 0.08); 
+            border-radius: 4px; /* Industrial sharp edges for professionalism */
+            padding: 4rem 2rem; width: 280px; cursor: pointer; 
+            transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+            display: flex; flex-direction: column; align-items: center; gap: 2.5rem;
+            backdrop-filter: blur(40px);
+            box-shadow: 0 20px 80px rgba(0,0,0,0.6);
+            position: relative;
         }
-        .card::before {
-            content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(0, 242, 255, 0.1), transparent);
-            transition: 0.6s;
+        .card::after {
+            content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 3px;
+            background: var(--accent); transform: scaleX(0); transition: 0.4s; transform-origin: left;
         }
-        .card:hover::before { left: 100%; }
+        .card:hover::after { transform: scaleX(1); }
         .card:hover { 
-            transform: translateY(-20px) scale(1.02); 
-            border-color: #00f2ff; 
-            background: rgba(0, 242, 255, 0.05);
-            box-shadow: 0 30px 60px rgba(0, 242, 255, 0.15); 
+            transform: translateY(-15px); 
+            background: rgba(255, 255, 255, 0.03);
+            border-color: var(--accent);
+            box-shadow: 0 40px 100px rgba(0, 242, 255, 0.1); 
         }
-        .card img { filter: drop-shadow(0 0 15px rgba(255,255,255,0.2)); transition: 0.3s; }
-        .card:hover img { transform: scale(1.1); filter: drop-shadow(0 0 25px #00f2ff); }
+        .card img { transition: 0.4s; filter: brightness(0.9); }
+        .card:hover img { transform: translateY(-5px); filter: brightness(1.2) drop-shadow(0 0 20px var(--accent)); }
         
         .card span { 
-            font-weight: 300; font-size: 1.4rem; letter-spacing: 2px; 
-            text-transform: uppercase; color: rgba(255,255,255,0.9);
+            font-weight: 300; font-size: 1.1rem; letter-spacing: 4px; 
+            text-transform: uppercase; color: var(--text-dim);
             transition: 0.3s;
         }
-        .card:hover span { color: #00f2ff; text-shadow: 0 0 10px rgba(0,242,255,0.5); }
+        .card:hover span { color: #fff; letter-spacing: 5px; }
 
         .card.highlight { 
-            border: 2px solid #00f2ff; 
-            background: rgba(0, 242, 255, 0.1);
-            box-shadow: 0 0 50px rgba(0, 242, 255, 0.4); 
-            animation: cardPulse 1.5s infinite alternate;
+            border: 1px solid var(--accent); 
+            background: rgba(0, 242, 255, 0.04);
+            box-shadow: inset 0 0 30px rgba(0, 242, 255, 0.1), 0 0 60px rgba(0, 242, 255, 0.2); 
+            animation: activeScan 2s infinite alternate;
         }
-        @keyframes cardPulse { 
-            from { transform: scale(1.05); box-shadow: 0 0 40px rgba(0, 242, 255, 0.3); } 
-            to { transform: scale(1.08); box-shadow: 0 0 60px rgba(0, 242, 255, 0.6); } 
-        }
+        @keyframes activeScan { 0% { border-color: rgba(0, 242, 255, 0.3); } 100% { border-color: var(--accent); } }
 
         /* Classic Professional Chatbot Widget */
         .chat-fab {
@@ -236,33 +247,54 @@
         <div class="knowledge-btn" onclick="openAdmin()">⚡</div>
     </div>
 
-    <!-- App -->
+    <!-- App Layout -->
     <div id="app-container">
-        <div class="left-panel"></div>
+        <div class="left-panel">
+            <div class="hud-corner top-left"></div>
+            <div class="hud-corner bottom-left"></div>
+        </div>
         <div class="right-panel">
+            <div class="hud-header">
+                <div class="hud-status">
+                    <div class="hud-point"></div>
+                    <span>System Status: Optimal</span>
+                    <span style="opacity: 0.3;">/</span>
+                    <span>Network: Secured</span>
+                </div>
+                <div class="hud-status" style="opacity: 0.5;">
+                    <span id="current-time">00:00:00</span>
+                </div>
+            </div>
+            
+            <div class="hud-corner top-right"></div>
+            <div class="hud-corner bottom-right"></div>
+
             <div class="selection-area">
-                <h1 style="font-size: 3.5rem; margin-bottom: 0.8rem; letter-spacing: -2px; font-weight: 600;">Centro de Comando</h1>
-                <p style="color: #666; font-size: 1.2rem; margin-bottom: 5rem; font-weight: 300;">Soporte Técnico de Alta Disponibilidad</p>
+                <p style="color: var(--accent); font-size: 0.8rem; letter-spacing: 6px; text-transform: uppercase; margin-bottom: 1rem; font-weight: 300;">EuroSupport Command Center</p>
+                <h1 style="font-size: 4rem; margin-bottom: 1rem; letter-spacing: -1px; font-weight: 200; text-transform: uppercase; font-family: 'Inter', sans-serif;">Centro de Control</h1>
+                <div style="width: 50px; height: 1px; background: var(--accent); margin: 0 auto 4rem; opacity: 0.5;"></div>
 
                 <div class="company-cards">
                     <div class="card" id="card-Euroconnect">
-                        <img src="https://cdn-icons-png.flaticon.com/512/2891/2891415.png" height="70">
-                        <span style="font-weight: 600; font-size: 1.3rem;">Euroconnect</span>
+                        <img src="https://cdn-icons-png.flaticon.com/512/2891/2891415.png" height="50">
+                        <span>Euroconnect</span>
                     </div>
                     <div class="card" id="card-TI-Euromotors">
-                        <img src="https://cdn-icons-png.flaticon.com/512/3202/3202926.png" height="70">
-                        <span style="font-weight: 600; font-size: 1.3rem;">TI Euromotors</span>
+                        <img src="https://cdn-icons-png.flaticon.com/512/3202/3202926.png" height="50">
+                        <span>TI Euromotors</span>
                     </div>
                     <div class="card" id="card-Mesa-de-Ayuda-SIS">
-                        <img src="https://cdn-icons-png.flaticon.com/512/1063/1063376.png" height="70">
-                        <span style="font-weight: 600; font-size: 1.3rem;">Mesa de Ayuda SIS</span>
+                        <img src="https://cdn-icons-png.flaticon.com/512/1063/1063376.png" height="50">
+                        <span>Soporte SIS</span>
                     </div>
                 </div>
 
                 <div style="margin-top: 6rem;">
-                    <button style="display: flex; align-items: center; gap: 15px; margin: 0 auto; padding: 1.2rem 3rem; border: none; background: #1a1a1a; color: white; border-radius: 20px; cursor: pointer; box-shadow: 0 10px 30px rgba(0,0,0,0.1); font-weight: 600; transition: 0.3s;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
-                        <img src="https://www.gstatic.com/images/branding/product/1x/gsa_512dp.png" width="24">
-                        Google SSO Authentication
+                    <button style="background: transparent; border: 1px solid rgba(255,255,255,0.1); color: #fff; padding: 1.2rem 3rem; border-radius: 4px; display: flex; align-items: center; gap: 15px; margin: 0 auto; cursor: pointer; transition: 0.4s; font-size: 0.9rem; letter-spacing: 2px; text-transform: uppercase; font-weight: 300;" 
+                            onmouseover="this.style.borderColor='var(--accent)'; this.style.background='rgba(0,242,255,0.02)'" 
+                            onmouseout="this.style.borderColor='rgba(255,255,255,0.1)'; this.style.background='transparent'">
+                        <img src="https://www.gstatic.com/images/branding/product/1x/gsa_512dp.png" width="20" style="filter: grayscale(1);">
+                        SSO Authentication Required
                     </button>
                 </div>
             </div>
@@ -411,6 +443,13 @@
                 }
             } catch (e) { alert('Error al procesar el archivo.'); }
         }
+        // Clock HUD
+        function updateClock() {
+            const now = new Date();
+            document.getElementById('current-time').innerText = now.toLocaleTimeString('en-US', { hour12: false });
+        }
+        setInterval(updateClock, 1000);
+        updateClock();
     </script>
 </body>
 </html>
