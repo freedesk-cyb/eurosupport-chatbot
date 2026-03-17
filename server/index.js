@@ -17,8 +17,9 @@ let model = null;
 
 if (apiKey) {
     genAI = new GoogleGenerativeAI(apiKey);
+    // Usamos gemini-1.5-flash, que es compatible con las versiones modernas del SDK
     model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
-    console.log("AI: Gemini Initialized with API Key");
+    console.log("AI: Gemini Initialized (Model: gemini-1.5-flash)");
 } else {
     console.error("AI: GEMINI_API_KEY is missing in environment variables");
 }
