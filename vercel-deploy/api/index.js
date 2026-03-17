@@ -1,3 +1,6 @@
+require('dotenv').config();
+const { GoogleGenerativeAI } = require('@google/generative-ai');
+
 const express = require('express');
 const cors = require('cors');
 const multer = require('multer');
@@ -9,93 +12,74 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// Global knowledge base in-memory (For Vercel, this is ephemeral per instance)
-// To make it persistent for everyone forever, a real DB (like Supabase/Mongo) is required.
+// Initialize Gemini
+const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || "");
+const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+
+// Global knowledge base in-memory
 let globalKnowledgeBase = "";
 
 const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
 
-// Simple Auth Middleware
-const isAdmin = (req, res, next) => {
-    // In a real app, check session/token. Simulation for now.
-    next();
-};
-
 // Upload Endpoint
 app.post('/api/upload', upload.single('document'), async (req, res) => {
     try {
         const { password } = req.body;
-        if (password !== 'admin123') { // Simple password check
-            return res.status(401).json({ error: 'Contraseña incorrecta para carga de conocimiento.' });
+        if (password !== 'admin123') { 
+            return res.status(401).json({ error: 'Contraseña incorrecta.' });
         }
 
-        if (!req.file) {
-            return res.status(400).json({ error: 'No file uploaded.' });
-        }
+        if (!req.file) return res.status(400).json({ error: 'No file.' });
         
         const result = await mammoth.extractRawText({ buffer: req.file.buffer });
         globalKnowledgeBase = result.value || "";
         
-        res.json({ message: 'Global knowledge updated successfully!', size: globalKnowledgeBase.length });
+        res.json({ message: 'Conocimiento actualizado!', size: globalKnowledgeBase.length });
     } catch (error) {
-        console.error('Upload Error:', error);
-        res.status(500).json({ error: 'Failed to process document.' });
+        res.status(500).json({ error: 'Error al procesar documento.' });
     }
 });
 
-// Chat Endpoint
-app.post('/api/chat', (req, res) => {
+// Chat Endpoint - AI POWERED
+app.post('/api/chat', async (req, res) => {
     const { message } = req.body;
-    if (!message) return res.status(400).json({ error: 'Message is required.' });
+    if (!message) return res.status(400).json({ error: 'Message required.' });
 
-    const query = message.toLowerCase();
-    let response = "";
-    let suggestedCompany = null;
+    try {
+        const prompt = `
+            Eres "Asistente EuroSupport", un experto en soporte técnico corporativo. 
+            Tu objetivo es guiar al usuario usando EXCLUSIVAMENTE el siguiente manual de conocimiento como base de verdad.
 
-    // Check for "crear ticket" or "problema" to trigger special behavior
-    if (query.includes('ticket') || query.includes('problema') || query.includes('crear')) {
-        response = "Entiendo que quieres crear un ticket. Por favor, dime ¿cuál es exactamente el problema que tienes? (Ej: red, correos, software)";
+            MANUAL DE CONOCIMIENTO (CONTEXTO):
+            ${globalKnowledgeBase || "El manual está vacío. Pide al usuario que suba uno en el panel de administración."}
+
+            REGLAS DE RESPUESTA:
+            1. Responde de forma profesional, amable y concisa.
+            2. Identifica si el problema del usuario pertenece a una de estas 3 áreas:
+               - Red / Internet / Conectividad -> Sugerir: "Euroconnect"
+               - Vehículos / Motores / Talleres -> Sugerir: "TI Euromotors"
+               - Software / SIS / Sistemas especializados -> Sugerir: "Mesa de Ayuda SIS"
+            3. Si no puedes responder con el manual, indícalo amablemente.
+            4. IMPORTANTE: Tu respuesta DEBE ser un objeto JSON estrictamente válido con este formato:
+               { "reply": "Tu respuesta aquí...", "suggestedCompany": "Euroconnect" o "TI Euromotors" o "Mesa de Ayuda SIS" o null }
+
+            PREGUNTA DEL USUARIO: ${message}
+        `;
+
+        const result = await model.generateContent(prompt);
+        const response = await result.response;
+        const text = response.text();
         
-        // Logical routing based on problem details if provided in same message
-        if (query.includes('red') || query.includes('internet') || query.includes('conexion')) {
-            suggestedCompany = 'Euroconnect';
-            response = "Para problemas de red, el ticket debe crearse en **Euroconnect**. He resaltado el punto donde debes hacer click.";
-        } else if (query.includes('hardware') || query.includes('computadora') || query.includes('laptop')) {
-            suggestedCompany = 'TI Euromotors';
-            response = "Para problemas de equipos, el ticket debe crearse en **TI Euromotors**. He resaltado el punto correspondiente.";
-        } else if (query.includes('sistema') || query.includes('software') || query.includes('contraseña')) {
-            suggestedCompany = 'Mesa de Ayuda SIS';
-            response = "Para problemas de sistemas o software, el ticket debe crearse en **Mesa de Ayuda SIS**. Mira el recuadro resaltado.";
-        }
-    } else {
-        const docText = globalKnowledgeBase.toLowerCase();
-        if (!docText) {
-            response = "Lo siento, aún no he cargado la base de conocimientos. Por favor, sube un documento Word en el panel de administrador.";
-        } else {
-            const sections = docText.split(/[.\n]/);
-            const matches = sections.filter(s => s.includes(query) && s.trim().length > 10);
+        // Clean JSON from Markdown if present
+        const jsonMatch = text.match(/\{[\s\S]*\}/);
+        const jsonResponse = jsonMatch ? JSON.parse(jsonMatch[0]) : { reply: text, suggestedCompany: null };
 
-            if (matches.length > 0) {
-                response = "He encontrado esta información para ayudarte: \n\n" + matches.slice(0, 2).join('.\n') + ".";
-            } else {
-                response = "No estoy seguro de cómo ayudarte con eso basado en el documento actual. ¿Podrías intentar con otras palabras o contactar a soporte técnico directamente?";
-            }
-        }
+        res.json(jsonResponse);
+    } catch (error) {
+        console.error('AI Error:', error);
+        res.status(500).json({ reply: "Lo siento, mi cerebro artificial está experimentando una sobrecarga. Intentemos de nuevo en un momento. 🛠️", suggestedCompany: null });
     }
-
-    // Default company suggestions if not set by ticket logic
-    if (!suggestedCompany) {
-        if (query.includes('euroconnect') || query.includes('camion') || query.includes('transporte') || query.includes('logistica')) {
-            suggestedCompany = 'Euroconnect';
-        } else if (query.includes('euromotors') || query.includes('carro') || query.includes('auto') || query.includes('motor')) {
-            suggestedCompany = 'TI Euromotors';
-        } else if (query.includes('sis') || query.includes('sistema') || query.includes('ayuda')) {
-            suggestedCompany = 'Mesa de Ayuda SIS';
-        }
-    }
-
-    res.json({ reply: response, suggestedCompany });
 });
 
 // Mock Login Endpoint
