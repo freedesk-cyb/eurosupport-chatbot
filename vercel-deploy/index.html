@@ -11,23 +11,26 @@
     <style>
         :root {
             --primary: #007bff;
+            --primary-light: rgba(0, 123, 255, 0.1);
             --bg-body: #ffffff;
             --bg-card: #ffffff;
             --text-main: #212529;
             --text-light: #6c757d;
             --border-gray: #dee2e6;
             --border-active: #007bff;
-            --shadow-sm: 0 2px 4px rgba(0,0,0,0.05);
-            --transition: all 0.2s ease-in-out;
+            --shadow-sm: 0 4px 10px rgba(0,0,0,0.05);
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { 
             height: 100vh; 
-            background: linear-gradient(rgba(255, 255, 255, 0.92), rgba(255, 255, 255, 0.85)), url('it_bg.png');
+            background: linear-gradient(rgba(255, 255, 255, 0.94), rgba(255, 255, 255, 0.88)), url('it_bg.png');
             background-size: cover; background-position: center;
             overflow-x: hidden; 
             font-family: 'Inter', sans-serif; color: var(--text-main);
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
         }
 
         #app-container {
@@ -58,7 +61,7 @@
         .card {
             background: var(--bg-card); 
             border: 2px solid var(--border-gray); 
-            border-radius: 12px;
+            border-radius: 16px;
             padding: 2.5rem; 
             cursor: pointer; 
             display: flex; flex-direction: column; align-items: center; justify-content: center;
@@ -67,11 +70,17 @@
             box-shadow: var(--shadow-sm);
             text-align: center;
         }
-        .card:hover { border-color: #adb5bd; transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
+        .card:hover { border-color: var(--primary); transform: translateY(-5px); box-shadow: 0 10px 30px rgba(0,0,0,0.08); }
         
         .card.highlight { 
-            border-color: var(--border-active); 
-            box-shadow: 0 0 0 1px var(--border-active);
+            border: 4px solid var(--primary); 
+            box-shadow: 0 0 25px rgba(0,123,255,0.3);
+            animation: pulse-active 2s infinite;
+        }
+        @keyframes pulse-active {
+            0% { box-shadow: 0 0 0 0 rgba(0, 123, 255, 0.4); }
+            70% { box-shadow: 0 0 0 15px rgba(0, 123, 255, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(0, 123, 255, 0); }
         }
 
         .card-img-container { width: 120px; display: flex; justify-content: center; align-items: center; }
@@ -79,12 +88,12 @@
         
         /* Card Text Adjustments */
         .card span { 
-            font-weight: 500; font-size: 1.1rem; color: var(--text-main);
-            text-transform: uppercase; letter-spacing: 1px;
+            font-weight: 700; font-size: 1.15rem; color: var(--text-main);
+            text-transform: uppercase; letter-spacing: 1.5px;
             transition: var(--transition);
         }
         .card:hover span { color: var(--primary); }
-        .card.highlight span { color: var(--border-active); }
+        .card.highlight span { color: var(--primary); }
 
         /* Sync Card (Matches Grid) */
         .card.sync-card {
@@ -341,6 +350,9 @@
             input.value = '';
 
             try {
+                // Remove existing highlights
+                document.querySelectorAll('.card').forEach(c => c.classList.remove('highlight'));
+
                 const res = await fetch(`${API_URL}/chat`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -348,20 +360,36 @@
                 });
                 const data = await res.json();
                 
-                addMessage(data.reply, 'bot');
+                let reply = data.reply;
+                let suggested = data.suggestedCompany;
 
-                if (data.suggestedCompany) {
-                    highlightCard(data.suggestedCompany);
+                // Client-side intelligence backup (Knowledge manual pointing)
+                const qLower = q.toLowerCase();
+                if (!suggested) {
+                    if (qLower.includes('red') || qLower.includes('internet') || qLower.includes('wifi')) suggested = 'Euroconnect';
+                    else if (qLower.includes('auto') || qLower.includes('vehi') || qLower.includes('motor')) suggested = 'TI Euromotors';
+                    else if (qLower.includes('software') || qLower.includes('sis') || qLower.includes('sistema')) suggested = 'Mesa de Ayuda SIS';
                 }
+
+                if (suggested) {
+                    reply = `He analizado el manual de conocimiento. ✨ De acuerdo al problema planteado, por favor haz clic en la tarjeta de **${suggested.toUpperCase()}** que acabo de resaltar para ti.`;
+                    highlightCard(suggested);
+                }
+
+                addMessage(reply, 'bot');
             } catch (e) {
                 addMessage('Lo siento, hay un problema técnico en mi núcleo de comunicación. 🛠️', 'bot');
             }
         }
 
         function highlightCard(name) {
-            document.querySelectorAll('.card').forEach(c => c.classList.remove('highlight'));
-            const id = 'card-' + name.replace(/ /g, '-');
-            const el = document.getElementById(id);
+            const idMap = {
+                'Euroconnect': 'card-Euroconnect',
+                'TI Euromotors': 'card-TI-Euromotors',
+                'Mesa de Ayuda SIS': 'card-Mesa-de-Ayuda-SIS'
+            };
+            const targetId = idMap[name] || ('card-' + name.replace(/ /g, '-'));
+            const el = document.getElementById(targetId);
             if (el) {
                 el.classList.add('highlight');
                 el.scrollIntoView({ behavior: 'smooth', block: 'center' });
