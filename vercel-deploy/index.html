@@ -48,17 +48,24 @@
         /* Card System - Horizontal Style */
         .selection-area { width: 100%; max-width: 800px; display: flex; flex-direction: column; align-items: center; }
         .company-cards { 
-            display: flex; flex-direction: column; gap: 1.5rem; width: 100%; margin-bottom: 4rem;
+            display: grid;
+            grid-template-columns: repeat(2, 2fr);
+            gap: 2rem;
+            width: 100%;
+            max-width: 900px;
+            margin-bottom: 4rem;
         }
         .card {
             background: var(--bg-card); 
             border: 2px solid var(--border-gray); 
-            border-radius: 8px;
-            padding: 1.5rem 2.5rem; 
+            border-radius: 12px;
+            padding: 2.5rem; 
             cursor: pointer; 
-            display: flex; align-items: center; gap: 2rem;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            gap: 1.5rem;
             transition: var(--transition);
             box-shadow: var(--shadow-sm);
+            text-align: center;
         }
         .card:hover { border-color: #adb5bd; transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
         
@@ -70,22 +77,25 @@
         .card-img-container { width: 120px; display: flex; justify-content: center; align-items: center; }
         .card img { width: 100%; height: auto; object-fit: contain; }
         
+        /* Card Text Adjustments */
         .card span { 
-            font-weight: 500; font-size: 1.1rem; color: var(--primary);
+            font-weight: 500; font-size: 1.1rem; color: var(--text-main);
+            text-transform: uppercase; letter-spacing: 1px;
             transition: var(--transition);
         }
+        .card:hover span { color: var(--primary); }
         .card.highlight span { color: var(--border-active); }
 
-        /* Small Sync Card */
+        /* Sync Card (Matches Grid) */
         .card.sync-card {
-            padding: 1rem 1.5rem;
-            background: #f8f9fa;
+            background: rgba(0, 123, 255, 0.02);
             border-style: dashed;
-            gap: 1rem;
         }
-        .card.sync-card .card-img-container { width: 40px; font-size: 1.5rem; }
-        .card.sync-card span { font-size: 0.9rem; color: var(--text-light); }
-        .card.sync-card:hover { border-style: solid; border-color: var(--primary); background: #fff; }
+        .card.sync-card .card-img-container { 
+            font-size: 2.5rem; color: var(--primary);
+            filter: drop-shadow(0 0 10px rgba(0, 123, 255, 0.2));
+        }
+        .card.sync-card:hover { border-style: solid; background: #fff; }
 
         /* SSO Button Styling */
         .sso-container { margin-top: 2rem; }
@@ -112,7 +122,10 @@
         @keyframes float { 0% { transform: translateY(0); } 50% { transform: translateY(-5px); } 100% { transform: translateY(0); } }
         
         .chat-fab:hover { transform: scale(1.05) rotate(5deg); box-shadow: 0 12px 30px rgba(0,123,255,0.5); }
-        .chat-fab img { width: 45px; height: 45px; object-fit: contain; }
+        .chat-fab img { 
+            width: 45px; height: 45px; object-fit: contain; 
+            background: radial-gradient(circle, #fff, #f0f4f8); border-radius: 50%; padding: 2px;
+        }
 
         .chat-window {
             position: fixed; bottom: 120px; right: 30px; width: 400px; height: 580px;
@@ -121,15 +134,38 @@
             display: none; flex-direction: column; z-index: 1500;
             overflow: hidden; animation: slideUp 0.3s ease-out;
         }
-        .chat-header { background: #f8f9fa; color: var(--text-main); border-bottom: 1px solid var(--border-gray); }
-        .chat-header span { color: var(--primary); }
+        .chat-header { 
+            padding: 1.2rem; background: #f8f9fa; color: var(--text-main); 
+            border-bottom: 1px solid var(--border-gray); display: flex; align-items: center; justify-content: space-between;
+        }
+        .chat-header-info { display: flex; align-items: center; gap: 10px; }
+        .chat-header-info img { 
+            width: 30px; height: 30px; border-radius: 50%; 
+            background: radial-gradient(circle, #fff, #f0f4f8); border: 1px solid var(--border-gray);
+        }
+        .chat-header-info span { font-weight: 600; color: var(--primary); font-size: 0.9rem; }
         .message.bot { background: #f0f4f8; color: #2c3e50; border: none; border-radius: 12px 12px 12px 4px; }
         
-        /* Admin Panel Light */
-        #admin-panel { background: rgba(255,255,255,0.9); backdrop-filter: blur(10px); }
-        .admin-box { background: #fff; border: 1px solid var(--border-gray); box-shadow: 0 20px 60px rgba(0,0,0,0.1); border-radius: 12px; }
-        .admin-box h2 { color: var(--text-main); letter-spacing: 0; font-weight: 600; }
-        #password-gate input { background: #f8f9fa; border-color: var(--border-gray); color: #333; }
+        /* Admin Panel Modal Correction */
+        #admin-panel { 
+            background: rgba(255,255,255,0.95); backdrop-filter: blur(15px); 
+            position: fixed; inset: 0; display: none; align-items: center; justify-content: center; z-index: 2000;
+        }
+        .admin-box { 
+            background: #fff; border: 1px solid var(--border-gray); 
+            box-shadow: 0 30px 100px rgba(0,0,0,0.15); border-radius: 16px; 
+            width: 100%; max-width: 500px; padding: 3rem; position: relative;
+        }
+        .admin-box h2 { color: var(--text-main); letter-spacing: -0.5px; font-weight: 700; margin-bottom: 0.5rem; }
+        .close-btn { position: absolute; top: 20px; right: 20px; cursor: pointer; color: var(--text-light); font-size: 1.5rem; }
+        .close-btn:hover { color: var(--primary); }
+        
+        #password-gate input { background: #f8f9fa; border: 1px solid var(--border-gray); color: #333; border-radius: 8px; font-size: 1.2rem; }
+        .sync-upload-box { 
+            border: 2px dashed var(--border-gray); padding: 3rem; border-radius: 12px; 
+            text-align: center; margin-top: 2rem; transition: var(--transition);
+        }
+        .sync-upload-box:hover { border-color: var(--primary); background: rgba(0,123,255,0.02); }
 
     </style>
 </head>
@@ -225,16 +261,14 @@
 
             <p style="color: #999; font-size: 0.8rem; margin-bottom: 2rem;">Los cambios en el manual afectarán el comportamiento del bot para toda la red.</p>
             
-            <div style="border: 1px solid rgba(0, 242, 255, 0.1); padding: 4rem; cursor: pointer; background: rgba(0, 242, 255, 0.02); transition: 0.3s; position: relative;" 
-                 onmouseover="this.style.background='rgba(0, 242, 255, 0.05)'; this.style.borderColor='rgba(0, 242, 255, 0.5)'" onmouseout="this.style.background='rgba(0, 242, 255, 0.02)'; this.style.borderColor='rgba(0, 242, 255, 0.1)'"
-                 onclick="document.getElementById('file-input').click()">
-                <div style="font-size: 3.5rem; margin-bottom: 20px; filter: drop-shadow(0 0 10px #00f2ff);">⚡</div>
-                <div style="font-weight: 300; color: #00f2ff; letter-spacing: 2px;">VINCULACIÓN DE NÚCLEO (.docx)</div>
+            <div class="sync-upload-box" onclick="document.getElementById('file-input').click()">
+                <div style="font-size: 3rem; margin-bottom: 15px;">📄</div>
+                <div style="font-weight: 600; color: var(--primary); letter-spacing: 1px; font-size: 0.8rem; text-transform: uppercase;">Adjuntar Manual (.docx)</div>
                 <input type="file" id="file-input" accept=".docx" style="display:none" onchange="handleFile(this)">
-                <div id="file-name" style="margin-top: 25px; font-size: 1rem; color: #fff; font-family: monospace;"></div>
+                <div id="file-name" style="margin-top: 15px; font-size: 0.9rem; color: var(--text-main); font-family: monospace;"></div>
             </div>
 
-            <button onclick="uploadWord()" style="margin-top: 3rem; width: 100%; padding: 1.5rem; background: #00f2ff; color: #000; border: none; border-radius: 0; font-weight: 800; cursor: pointer; box-shadow: 0 0 30px rgba(0, 242, 255, 0.3); text-transform: uppercase; letter-spacing: 3px; transition: 0.3s;">
+            <button onclick="uploadWord()" style="margin-top: 2.5rem; width: 100%; padding: 1.2rem; background: var(--primary); color: #fff; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; box-shadow: 0 4px 15px rgba(0, 123, 255, 0.3); text-transform: uppercase; letter-spacing: 1px; transition: 0.3s;">
                 Ejecutar Sincronización
             </button>
         </div>
