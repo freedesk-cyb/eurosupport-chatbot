@@ -12,11 +12,11 @@
         :root {
             --primary: #0088ff;
             --accent: #00f2ff;
-            --bg-dark: #02050a;
-            --glass-bg: rgba(255, 255, 255, 0.03);
-            --glass-border: rgba(0, 242, 255, 0.2);
+            --bg-dark: #070b14; /* Slightly lighter professional slate */
+            --glass-bg: rgba(255, 255, 255, 0.04);
+            --glass-border: rgba(0, 242, 255, 0.25);
             --text-main: #ffffff;
-            --text-dim: rgba(255, 255, 255, 0.6);
+            --text-dim: rgba(255, 255, 255, 0.7);
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -47,17 +47,23 @@
 
         .right-panel {
             flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center;
-            background: radial-gradient(circle at center, #0a1525 0%, #02050a 100%); 
+            background: linear-gradient(135deg, #0a111f 0%, #05080f 100%); 
             position: relative; padding: 2rem;
         }
 
         /* HUD Elements */
         .hud-header {
-            position: absolute; top: 0; left: 0; width: 100%; height: 80px;
-            padding: 0 3rem; display: flex; align-items: center; justify-content: space-between;
-            border-bottom: 1px solid rgba(255,255,255,0.05); z-index: 100;
+            position: absolute; top: 0; left: 0; width: 100%; height: 100px;
+            padding: 0 4rem; display: flex; align-items: center; justify-content: space-between;
+            border-bottom: 1px solid rgba(255,255,255,0.08); z-index: 100;
+            background: linear-gradient(to bottom, rgba(0,0,0,0.3), transparent);
         }
-        .hud-status { display: flex; align-items: center; gap: 2rem; font-size: 0.7rem; letter-spacing: 2px; text-transform: uppercase; color: var(--accent); opacity: 0.7; }
+        .header-title { 
+            position: absolute; left: 50%; transform: translateX(-50%);
+            color: var(--accent); font-size: 0.8rem; letter-spacing: 8px; 
+            text-transform: uppercase; font-weight: 300; white-space: nowrap;
+        }
+        .hud-status { display: flex; align-items: center; gap: 1.5rem; font-size: 0.7rem; letter-spacing: 2px; text-transform: uppercase; color: var(--accent); opacity: 0.8; }
         .hud-point { width: 6px; height: 6px; background: var(--accent); border-radius: 50%; box-shadow: 0 0 10px var(--accent); animation: pulse 2s infinite; }
         @keyframes pulse { 0% { opacity: 0.5; } 50% { opacity: 1; } 100% { opacity: 0.5; } }
 
@@ -70,18 +76,24 @@
         .bottom-left { bottom: 20px; left: 20px; border-right: none; border-top: none; }
         .bottom-right { bottom: 20px; right: 20px; border-left: none; border-top: none; }
 
-        /* Company Selection - High Clarity */
-        .selection-area { text-align: center; width: 100%; max-width: 1000px; z-index: 10; padding-top: 40px; }
-        .company-cards { display: flex; flex-wrap: wrap; justify-content: center; gap: 3rem; margin-top: 5rem; }
+        /* Company Selection - Refined Alignment */
+        .selection-area { text-align: center; width: 100%; max-width: 1100px; z-index: 10; margin-top: 40px; }
+        .company-cards { 
+            display: grid; 
+            grid-template-columns: repeat(3, 1fr); 
+            gap: 2rem; 
+            margin-top: 5rem;
+            width: 100%;
+        }
         .card {
-            background: rgba(255, 255, 255, 0.015); 
-            border: 1px solid rgba(255, 255, 255, 0.08); 
-            border-radius: 4px; /* Industrial sharp edges for professionalism */
-            padding: 4rem 2rem; width: 280px; cursor: pointer; 
+            background: rgba(255, 255, 255, 0.02); 
+            border: 1px solid rgba(255, 255, 255, 0.1); 
+            border-radius: 4px; 
+            padding: 4rem 1rem; cursor: pointer; 
             transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
             display: flex; flex-direction: column; align-items: center; gap: 2.5rem;
-            backdrop-filter: blur(40px);
-            box-shadow: 0 20px 80px rgba(0,0,0,0.6);
+            backdrop-filter: blur(50px);
+            box-shadow: 0 20px 80px rgba(0,0,0,0.5);
             position: relative;
         }
         .card::after {
@@ -257,12 +269,15 @@
             <div class="hud-header">
                 <div class="hud-status">
                     <div class="hud-point"></div>
-                    <span>System Status: Optimal</span>
-                    <span style="opacity: 0.3;">/</span>
-                    <span>Network: Secured</span>
+                    <span>Status: Optimal</span>
+                    <span style="opacity: 0.2;">|</span>
+                    <span>Secure Env</span>
                 </div>
-                <div class="hud-status" style="opacity: 0.5;">
-                    <span id="current-time">00:00:00</span>
+                
+                <div class="header-title">Command Center</div>
+
+                <div class="hud-status">
+                    <span id="current-time" style="font-family: monospace; letter-spacing: 4px;">00:00:00</span>
                 </div>
             </div>
             
