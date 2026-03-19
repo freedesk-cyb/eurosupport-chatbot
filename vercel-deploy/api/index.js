@@ -4,12 +4,18 @@ const express = require('express');
 const cors = require('cors');
 const multer = require('multer');
 const mammoth = require('mammoth');
-const { kv } = require('@vercel/kv');
+const { createClient } = require('@vercel/kv');
 const path = require('path');
 
 const app = express();
 app.use(cors());
 app.use(express.json());
+
+// Flexible KV Initialization
+const kv = createClient({
+  url: process.env.KV_REST_API_URL || process.env.UPSTASH_REDIS_REST_URL || process.env.REDIS_URL,
+  token: process.env.KV_REST_API_TOKEN || process.env.UPSTASH_REDIS_REST_TOKEN || process.env.REDIS_TOKEN,
+});
 
 // Groq API Configuration
 const GROQ_API_KEY = process.env.GROQ_API_KEY || "";
@@ -254,7 +260,11 @@ app.post('/api/login', (req, res) => {
 
 // Health & Status Endpoint
 app.get('/api/status', async (req, res) => {
-    const hasKvConfig = !!(process.env.KV_URL || process.env.KV_REST_API_URL || process.env.KV_REST_API_TOKEN);
+    const hasKvConfig = !!(
+        process.env.KV_REST_API_URL || 
+        process.env.UPSTASH_REDIS_REST_URL || 
+        process.env.REDIS_URL
+    );
     res.json({
         manual_active: globalKnowledgeBase.length > 0,
         manual_size: globalKnowledgeBase.length,
