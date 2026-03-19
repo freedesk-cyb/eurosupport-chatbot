@@ -313,6 +313,10 @@
 
             <p style="color: #999; font-size: 0.8rem; margin-bottom: 2rem;">Los cambios en el manual afectarán el comportamiento del bot para toda la red.</p>
             
+            <div id="manual-status" style="margin-bottom: 1rem; font-size: 0.8rem; color: #666; padding: 10px; border-radius: 6px; background: #f0f4f8; display: none;">
+                Estado: <span id="status-text">Verificando...</span>
+            </div>
+            
             <div class="sync-upload-box" onclick="document.getElementById('file-input').click()">
                 <div style="font-size: 3rem; margin-bottom: 15px;">📄</div>
                 <div style="font-weight: 600; color: var(--primary); letter-spacing: 1px; font-size: 0.8rem; text-transform: uppercase;">Adjuntar Manual (.docx)</div>
@@ -402,9 +406,21 @@
             }
         }
 
-        function openAdmin() { 
+        async function openAdmin() { 
             document.getElementById('admin-panel').style.display = 'flex'; 
             document.getElementById('admin-password').focus();
+            
+            // Fetch status
+            try {
+                const res = await fetch(`${API_URL}/status`);
+                const data = await res.json();
+                const statusEl = document.getElementById('manual-status');
+                statusEl.style.display = 'block';
+                document.getElementById('status-text').innerText = data.manual_active 
+                    ? `Manual activo (${data.manual_size} caracteres)` 
+                    : 'Sin manual cargado (Uso de IA genérica)';
+                document.getElementById('status-text').style.color = data.manual_active ? '#28a745' : '#dc3545';
+            } catch (e) { console.error('Error fetching status'); }
         }
         function closeAdmin() { document.getElementById('admin-panel').style.display = 'none'; }
 

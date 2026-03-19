@@ -159,6 +159,7 @@ app.post('/api/upload', upload.single('document'), async (req, res) => {
         res.json({
             message: '¡Manual analizado y cargado con éxito!',
             size: globalKnowledgeBase.length,
+            status: 'persistent_kv',
             routing_summary: routingMap.summary,
             topics_found: {
                 euroconnect: routingMap.euroconnect.length,
@@ -202,8 +203,8 @@ CLASIFICACIÓN ESTÁNDAR (sin manual cargado):
     const systemPrompt = `
 Eres "Asistente EuroSupport", un experto en soporte técnico corporativo. Responde en ESPAÑOL.
 
-BASE DE CONOCIMIENTO DEL MANUAL:
-${globalKnowledgeBase ? globalKnowledgeBase.substring(0, 4000) : "Manual no cargado."}
+BASE DE CONOCIMIENTO DEL MANUAL (Prioridad Alta):
+${globalKnowledgeBase ? globalKnowledgeBase.substring(0, 10000) : "Manual no cargado."}
 
 ${routingContext}
 
@@ -248,6 +249,16 @@ app.post('/api/login', (req, res) => {
     } else {
         res.status(401).json({ success: false, error: 'Credenciales inválidas' });
     }
+});
+
+// Health & Status Endpoint
+app.get('/api/status', async (req, res) => {
+    res.json({
+        manual_active: globalKnowledgeBase.length > 0,
+        manual_size: globalKnowledgeBase.length,
+        routing_map: routingMap,
+        using_kv: true
+    });
 });
  
 // Load knowledge on startup
