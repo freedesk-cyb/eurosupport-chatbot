@@ -4,7 +4,7 @@ const express = require('express');
 const cors = require('cors');
 const multer = require('multer');
 const mammoth = require('mammoth');
-const fs = require('fs');
+const { kv } = require('@vercel/kv');
 const path = require('path');
 
 const app = express();
@@ -19,7 +19,7 @@ const GROQ_MODEL = "llama-3.3-70b-versatile";
 console.log("SYSTEM: EuroSupport AI v4.0.0 (Smart Routing + Manual Pre-Analysis)");
 
 // Knowledge Storage
-const KNOWLEDGE_FILE = path.join(__dirname, 'knowledge_store.json');
+const KNOWLEDGE_KEY = 'chatbot_knowledge_v1';
 let globalKnowledgeBase = "";    // Raw text from manual
 let routingMap = {               // Pre-analyzed routing map extracted from manual
     euroconnect: [],             // Keywords/topics for Euroconnect
@@ -29,29 +29,31 @@ let routingMap = {               // Pre-analyzed routing map extracted from manu
 };
 
 // Persistence functions
-function saveKnowledge() {
+async function saveKnowledge() {
     try {
         const data = {
             globalKnowledgeBase,
             routingMap
         };
-        fs.writeFileSync(KNOWLEDGE_FILE, JSON.stringify(data, null, 2));
-        console.log("Knowledge persisted to", KNOWLEDGE_FILE);
+        await kv.set(KNOWLEDGE_KEY, data);
+        console.log("Knowledge persisted to Vercel KV");
     } catch (e) {
-        console.error("Failed to save knowledge:", e.message);
+        console.error("Failed to save knowledge to KV:", e.message);
     }
 }
 
-function loadKnowledge() {
+async function loadKnowledge() {
     try {
-        if (fs.existsSync(KNOWLEDGE_FILE)) {
-            const data = JSON.parse(fs.readFileSync(KNOWLEDGE_FILE, 'utf8'));
+        const data = await kv.get(KNOWLEDGE_KEY);
+        if (data) {
             globalKnowledgeBase = data.globalKnowledgeBase || "";
             routingMap = data.routingMap || routingMap;
-            console.log("Knowledge loaded from", KNOWLEDGE_FILE, "(Size:", globalKnowledgeBase.length, ")");
+            console.log("Knowledge loaded from Vercel KV (Size:", globalKnowledgeBase.length, ")");
+        } else {
+            console.log("No previous knowledge found in Vercel KV.");
         }
     } catch (e) {
-        console.error("Failed to load knowledge:", e.message);
+        console.error("Failed to load knowledge from KV:", e.message);
     }
 }
 
@@ -151,8 +153,8 @@ app.post('/api/upload', upload.single('document'), async (req, res) => {
 
         console.log("Routing map built:", JSON.stringify(routingMap, null, 2));
 
-        // Persist knowledge to file
-        saveKnowledge();
+        // Persist knowledge to Vercel KV
+        await saveKnowledge();
 
         res.json({
             message: '¡Manual analizado y cargado con éxito!',
@@ -249,6 +251,8 @@ app.post('/api/login', (req, res) => {
 });
  
 // Load knowledge on startup
-loadKnowledge();
+loadKnowledge().then(() => {
+    console.log("Server ready with loaded knowledge.");
+});
 
 module.exports = app;
