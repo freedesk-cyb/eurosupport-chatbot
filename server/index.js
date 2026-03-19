@@ -149,33 +149,39 @@ app.post('/api/upload', upload.single('document'), async (req, res) => {
             return res.json({ message: 'Conocimiento actualizado (sin análisis IA - falta API Key)', size: globalKnowledgeBase.length });
         }
 
-        // PHASE 1: Pre-analyze the manual with AI to build routing map
-        console.log("Analyzing manual for routing...");
-        const analysis = await analyzeManualForRouting(globalKnowledgeBase);
-
-        routingMap = {
-            euroconnect: analysis.euroconnect || [],
-            euromotors: analysis.euromotors || [],
-            sis: analysis.sis || [],
-            analyzed: true,
-            summary: analysis.summary || ""
-        };
-
-        console.log("Routing map built:", JSON.stringify(routingMap, null, 2));
-
-        // Persist knowledge to Vercel KV
+        // STEP 1: Save raw text immediately (Quickest operation)
+        console.log("Saving raw knowledge to KV...");
         await saveKnowledge();
 
+        // STEP 2: Optional AI Analysis (Heuristic check)
+        if (GROQ_API_KEY && globalKnowledgeBase.length > 0) {
+            console.log("Starting quick AI analysis for routing...");
+            try {
+                // Use a smaller chunk (3000 chars) to ensure we stay under Vercel's 10s timeout
+                const analysis = await analyzeManualForRouting(globalKnowledgeBase.substring(0, 3000));
+                
+                routingMap = {
+                    euroconnect: analysis.euroconnect || [],
+                    euromotors: analysis.euromotors || [],
+                    sis: analysis.sis || [],
+                    analyzed: true,
+                    summary: analysis.summary || ""
+                };
+                
+                // Save again with the routing map
+                await saveKnowledge();
+                console.log("Routing map updated successfully.");
+            } catch (aiErr) {
+                console.warn("AI Analysis timed out or failed, using basic routing. Error:", aiErr.message);
+                // We don't fail the whole request, the manual is already saved!
+            }
+        }
+
         res.json({
-            message: '¡Manual analizado y cargado con éxito!',
+            message: '¡Manual cargado con éxito!',
             size: globalKnowledgeBase.length,
             status: 'persistent_kv',
-            routing_summary: routingMap.summary,
-            topics_found: {
-                euroconnect: routingMap.euroconnect.length,
-                euromotors: routingMap.euromotors.length,
-                sis: routingMap.sis.length
-            }
+            routing_ready: routingMap.analyzed
         });
     } catch (error) {
         console.error("Upload/Analysis error:", error);
