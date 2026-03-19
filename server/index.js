@@ -153,35 +153,15 @@ app.post('/api/upload', upload.single('document'), async (req, res) => {
         console.log("Saving raw knowledge to KV...");
         await saveKnowledge();
 
-        // STEP 2: Optional AI Analysis (Heuristic check)
-        if (GROQ_API_KEY && globalKnowledgeBase.length > 0) {
-            console.log("Starting quick AI analysis for routing...");
-            try {
-                // Use a smaller chunk (3000 chars) to ensure we stay under Vercel's 10s timeout
-                const analysis = await analyzeManualForRouting(globalKnowledgeBase.substring(0, 3000));
-                
-                routingMap = {
-                    euroconnect: analysis.euroconnect || [],
-                    euromotors: analysis.euromotors || [],
-                    sis: analysis.sis || [],
-                    analyzed: true,
-                    summary: analysis.summary || ""
-                };
-                
-                // Save again with the routing map
-                await saveKnowledge();
-                console.log("Routing map updated successfully.");
-            } catch (aiErr) {
-                console.warn("AI Analysis timed out or failed, using basic routing. Error:", aiErr.message);
-                // We don't fail the whole request, the manual is already saved!
-            }
-        }
+        // Skip AI analysis for now to ensure we never hit the Vercel timeout
+        // We will use basic routing or analyze dynamically during chat
+        routingMap.analyzed = false; 
 
         res.json({
             message: '¡Manual cargado con éxito!',
             size: globalKnowledgeBase.length,
             status: 'persistent_kv',
-            routing_ready: routingMap.analyzed
+            routing_ready: false
         });
     } catch (error) {
         console.error("Upload/Analysis error:", error);
