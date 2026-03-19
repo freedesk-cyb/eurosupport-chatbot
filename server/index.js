@@ -196,7 +196,7 @@ MAPA DE RUTAS APRENDIDO DEL MANUAL:
         : `
 CLASIFICACIÓN ESTÁNDAR (sin manual cargado):
 - EUROCONNECT: internet, red, wifi, VPN, router, switch, cable, conexión, DNS
-- TI EUROMOTORS: camión, vehículo, motor, taller, mecánico, flota, llanta
+- TI EUROMOTORS: camión, vehículo, motor, talleres, flotas, llantas
 - MESA DE AYUDA SIS: contraseña, software, sistema, correo, ERP, impresora, laptop
 `;
 
@@ -253,7 +253,7 @@ app.post('/api/login', (req, res) => {
 
 // Health & Status Endpoint
 app.get('/api/status', async (req, res) => {
-    const hasKvConfig = !!(process.env.KV_URL || process.env.KV_REST_API_URL);
+    const hasKvConfig = !!(process.env.KV_URL || process.env.KV_REST_API_URL || process.env.KV_REST_API_TOKEN);
     res.json({
         manual_active: globalKnowledgeBase.length > 0,
         manual_size: globalKnowledgeBase.length,
