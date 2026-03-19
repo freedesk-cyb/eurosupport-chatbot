@@ -416,10 +416,19 @@
                 const data = await res.json();
                 const statusEl = document.getElementById('manual-status');
                 statusEl.style.display = 'block';
+                
+                if (!data.kv_configured) {
+                    document.getElementById('status-text').innerText = 'ERROR: Base de datos KV no conectada en Vercel.';
+                    document.getElementById('status-text').style.color = '#721c24';
+                    statusEl.style.background = '#f8d7da';
+                    return;
+                }
+
                 document.getElementById('status-text').innerText = data.manual_active 
                     ? `Manual activo (${data.manual_size} caracteres)` 
                     : 'Sin manual cargado (Uso de IA genérica)';
                 document.getElementById('status-text').style.color = data.manual_active ? '#28a745' : '#dc3545';
+                statusEl.style.background = '#f0f4f8';
             } catch (e) { console.error('Error fetching status'); }
         }
         function closeAdmin() { document.getElementById('admin-panel').style.display = 'none'; }

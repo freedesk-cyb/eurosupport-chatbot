@@ -253,11 +253,13 @@ app.post('/api/login', (req, res) => {
 
 // Health & Status Endpoint
 app.get('/api/status', async (req, res) => {
+    const hasKvConfig = !!(process.env.KV_URL || process.env.KV_REST_API_URL);
     res.json({
         manual_active: globalKnowledgeBase.length > 0,
         manual_size: globalKnowledgeBase.length,
         routing_map: routingMap,
-        using_kv: true
+        using_kv: true,
+        kv_configured: hasKvConfig
     });
 });
  
