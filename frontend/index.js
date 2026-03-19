@@ -39,6 +39,7 @@ async function saveKnowledge() {
         console.log("Knowledge persisted to Vercel KV");
     } catch (e) {
         console.error("Failed to save knowledge to KV:", e.message);
+        throw new Error("Error al guardar en base de datos: " + e.message);
     }
 }
 
