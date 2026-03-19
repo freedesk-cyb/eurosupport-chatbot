@@ -11,11 +11,21 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// Flexible KV Initialization
-const kv = createClient({
-  url: process.env.KV_REST_API_URL || process.env.UPSTASH_REDIS_REST_URL || process.env.REDIS_URL,
-  token: process.env.KV_REST_API_TOKEN || process.env.UPSTASH_REDIS_REST_TOKEN || process.env.REDIS_TOKEN,
-});
+// Safe KV Initialization
+let kv;
+try {
+  const kvUrl = process.env.KV_REST_API_URL || process.env.UPSTASH_REDIS_REST_URL || process.env.REDIS_URL;
+  const kvToken = process.env.KV_REST_API_TOKEN || process.env.UPSTASH_REDIS_REST_TOKEN || process.env.REDIS_TOKEN;
+  
+  if (kvUrl && kvToken && kvUrl.startsWith('http')) {
+    kv = createClient({ url: kvUrl, token: kvToken });
+    console.log("KV Client initialized successfully.");
+  } else {
+    console.warn("KV credentials missing or invalid (must be HTTPS REST URL). Persistence disabled.");
+  }
+} catch (e) {
+  console.error("KV Initialization failed:", e.message);
+}
 
 // Groq API Configuration
 const GROQ_API_KEY = process.env.GROQ_API_KEY || "";
@@ -36,6 +46,10 @@ let routingMap = {               // Pre-analyzed routing map extracted from manu
 
 // Persistence functions
 async function saveKnowledge() {
+    if (!kv) {
+        console.warn("Cannot save: KV not initialized.");
+        return;
+    }
     try {
         const data = {
             globalKnowledgeBase,
@@ -50,6 +64,10 @@ async function saveKnowledge() {
 }
 
 async function loadKnowledge() {
+    if (!kv) {
+        console.warn("Cannot load: KV not initialized.");
+        return;
+    }
     try {
         const data = await kv.get(KNOWLEDGE_KEY);
         if (data) {
@@ -263,6 +281,16 @@ app.get('/api/status', async (req, res) => {
     });
 });
  
+// Global Error Handler
+app.use((err, req, res, next) => {
+    console.error("GLOBAL ERROR:", err);
+    res.status(500).json({ 
+        error: "Critical Server Error", 
+        message: err.message,
+        stack: process.env.NODE_ENV === 'development' ? err.stack : undefined
+    });
+});
+
 // Load knowledge on startup
 loadKnowledge().then(() => {
     console.log("Server ready with loaded knowledge.");
