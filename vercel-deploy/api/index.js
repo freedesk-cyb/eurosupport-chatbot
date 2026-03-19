@@ -4,6 +4,8 @@ const express = require('express');
 const cors = require('cors');
 const multer = require('multer');
 const mammoth = require('mammoth');
+const fs = require('fs');
+const path = require('path');
 
 const app = express();
 app.use(cors());
@@ -17,6 +19,7 @@ const GROQ_MODEL = "llama-3.3-70b-versatile";
 console.log("SYSTEM: EuroSupport AI v4.0.0 (Smart Routing + Manual Pre-Analysis)");
 
 // Knowledge Storage
+const KNOWLEDGE_FILE = path.join(__dirname, 'knowledge_store.json');
 let globalKnowledgeBase = "";    // Raw text from manual
 let routingMap = {               // Pre-analyzed routing map extracted from manual
     euroconnect: [],             // Keywords/topics for Euroconnect
@@ -24,6 +27,33 @@ let routingMap = {               // Pre-analyzed routing map extracted from manu
     sis: [],                     // Keywords/topics for Mesa de Ayuda SIS
     analyzed: false
 };
+
+// Persistence functions
+function saveKnowledge() {
+    try {
+        const data = {
+            globalKnowledgeBase,
+            routingMap
+        };
+        fs.writeFileSync(KNOWLEDGE_FILE, JSON.stringify(data, null, 2));
+        console.log("Knowledge persisted to", KNOWLEDGE_FILE);
+    } catch (e) {
+        console.error("Failed to save knowledge:", e.message);
+    }
+}
+
+function loadKnowledge() {
+    try {
+        if (fs.existsSync(KNOWLEDGE_FILE)) {
+            const data = JSON.parse(fs.readFileSync(KNOWLEDGE_FILE, 'utf8'));
+            globalKnowledgeBase = data.globalKnowledgeBase || "";
+            routingMap = data.routingMap || routingMap;
+            console.log("Knowledge loaded from", KNOWLEDGE_FILE, "(Size:", globalKnowledgeBase.length, ")");
+        }
+    } catch (e) {
+        console.error("Failed to load knowledge:", e.message);
+    }
+}
 
 const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
@@ -121,6 +151,9 @@ app.post('/api/upload', upload.single('document'), async (req, res) => {
 
         console.log("Routing map built:", JSON.stringify(routingMap, null, 2));
 
+        // Persist knowledge to file
+        saveKnowledge();
+
         res.json({
             message: '¡Manual analizado y cargado con éxito!',
             size: globalKnowledgeBase.length,
@@ -214,5 +247,8 @@ app.post('/api/login', (req, res) => {
         res.status(401).json({ success: false, error: 'Credenciales inválidas' });
     }
 });
+ 
+// Load knowledge on startup
+loadKnowledge();
 
 module.exports = app;
