@@ -460,7 +460,10 @@
                 } else {
                     alert(data.error || 'Fallo en la carga.');
                 }
-            } catch (e) { alert('Error al procesar el archivo.'); }
+            } catch (e) { 
+                alert('Error de conexión o servidor: ' + e.message); 
+                console.error('Upload error details:', e);
+            }
         }
     </script>
 </body>

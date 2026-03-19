@@ -132,11 +132,14 @@ Responde SOLO con este JSON:
 // Upload Endpoint - Now with AI pre-analysis
 app.post('/api/upload', upload.single('document'), async (req, res) => {
     try {
+        console.log("Upload request received. File:", req.file ? req.file.originalname : "No file");
+        
         const { password } = req.body;
         if (password !== 'admin123') return res.status(401).json({ error: 'Contraseña incorrecta.' });
-        if (!req.file) return res.status(400).json({ error: 'No file uploaded.' });
+        if (!req.file) return res.status(400).json({ error: 'No se subió ningún archivo.' });
 
         // Extract text from Word document
+        console.log("Extracting text with Mammoth...");
         const result = await mammoth.extractRawText({ buffer: req.file.buffer });
         globalKnowledgeBase = result.value || "";
 
