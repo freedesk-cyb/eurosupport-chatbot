@@ -267,17 +267,21 @@ app.post('/api/login', (req, res) => {
 
 // Health & Status Endpoint
 app.get('/api/status', async (req, res) => {
-    const hasKvConfig = !!(
+    // Check if KV is actually initialized, not just if variables exist
+    const isKvReady = !!kv;
+    const hasVariables = !!(
         process.env.KV_REST_API_URL || 
         process.env.UPSTASH_REDIS_REST_URL || 
         process.env.REDIS_URL
     );
+
     res.json({
         manual_active: globalKnowledgeBase.length > 0,
         manual_size: globalKnowledgeBase.length,
         routing_map: routingMap,
         using_kv: true,
-        kv_configured: hasKvConfig
+        kv_configured: isKvReady,
+        error: !isKvReady && hasVariables ? "URL de base de datos no compatible (debe empezar con https://)" : null
     });
 });
  
