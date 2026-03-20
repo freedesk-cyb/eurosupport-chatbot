@@ -4,27 +4,45 @@ const express = require('express');
 const cors = require('cors');
 const multer = require('multer');
 const mammoth = require('mammoth');
-const { createClient } = require('@vercel/kv');
+const { createClient: createKvClient } = require('@vercel/kv');
+const { createClient: createRedisClient } = require('redis');
 const path = require('path');
 
 const app = express();
 app.use(cors());
 app.use(express.json());
 
-// Safe KV Initialization
+// Safe Database Initialization (Supports both Vercel KV and Standard Redis)
 let kv;
-try {
-  const kvUrl = process.env.KV_REST_API_URL || process.env.UPSTASH_REDIS_REST_URL || process.env.REDIS_URL;
-  const kvToken = process.env.KV_REST_API_TOKEN || process.env.UPSTASH_REDIS_REST_TOKEN || process.env.REDIS_TOKEN;
-  
-  if (kvUrl && kvToken && kvUrl.startsWith('http')) {
-    kv = createClient({ url: kvUrl, token: kvToken });
-    console.log("KV Client initialized successfully.");
-  } else {
-    console.warn("KV credentials missing or invalid (must be HTTPS REST URL). Persistence disabled.");
-  }
-} catch (e) {
-  console.error("KV Initialization failed:", e.message);
+let redisClient;
+let dbType = "none";
+
+async function initDb() {
+    const url = process.env.KV_REST_API_URL || process.env.UPSTASH_REDIS_REST_URL || process.env.REDIS_URL;
+    const token = process.env.KV_REST_API_TOKEN || process.env.UPSTASH_REDIS_REST_TOKEN || process.env.REDIS_TOKEN;
+
+    if (!url) {
+        console.warn("No database URL found. Persistence disabled.");
+        return;
+    }
+
+    try {
+        if (url.startsWith('http')) {
+            // Use Vercel KV (REST)
+            kv = createKvClient({ url, token });
+            dbType = "vercel_kv";
+            console.log("Database initialized: Vercel KV (REST)");
+        } else if (url.startsWith('redis')) {
+            // Use Standard Redis (TCP)
+            redisClient = createRedisClient({ url });
+            await redisClient.connect();
+            dbType = "standard_redis";
+            console.log("Database initialized: Standard Redis (TCP)");
+        }
+    } catch (e) {
+        console.error("Database connection failed:", e.message);
+        dbType = "error";
+    }
 }
 
 // Groq API Configuration
@@ -46,39 +64,46 @@ let routingMap = {               // Pre-analyzed routing map extracted from manu
 
 // Persistence functions
 async function saveKnowledge() {
-    if (!kv) {
-        console.warn("Cannot save: KV not initialized.");
+    if (dbType === "none" || dbType === "error") {
+        console.warn("Cannot save: Database not ready.");
         return;
     }
     try {
-        const data = {
+        const data = JSON.stringify({
             globalKnowledgeBase,
             routingMap
-        };
-        await kv.set(KNOWLEDGE_KEY, data);
-        console.log("Knowledge persisted to Vercel KV");
+        });
+
+        if (dbType === "vercel_kv") {
+            await kv.set(KNOWLEDGE_KEY, data);
+        } else if (dbType === "standard_redis") {
+            await redisClient.set(KNOWLEDGE_KEY, data);
+        }
+        console.log("Knowledge persisted to DB (Type:", dbType, ")");
     } catch (e) {
-        console.error("Failed to save knowledge to KV:", e.message);
+        console.error("Failed to save knowledge:", e.message);
         throw new Error("Error al guardar en base de datos: " + e.message);
     }
 }
 
 async function loadKnowledge() {
-    if (!kv) {
-        console.warn("Cannot load: KV not initialized.");
-        return;
-    }
+    if (dbType === "none" || dbType === "error") return;
     try {
-        const data = await kv.get(KNOWLEDGE_KEY);
-        if (data) {
+        let rawData;
+        if (dbType === "vercel_kv") {
+            rawData = await kv.get(KNOWLEDGE_KEY);
+        } else if (dbType === "standard_redis") {
+            rawData = await redisClient.get(KNOWLEDGE_KEY);
+        }
+
+        if (rawData) {
+            const data = typeof rawData === 'string' ? JSON.parse(rawData) : rawData;
             globalKnowledgeBase = data.globalKnowledgeBase || "";
             routingMap = data.routingMap || routingMap;
-            console.log("Knowledge loaded from Vercel KV (Size:", globalKnowledgeBase.length, ")");
-        } else {
-            console.log("No previous knowledge found in Vercel KV.");
+            console.log("Knowledge loaded (Size:", globalKnowledgeBase.length, ")");
         }
     } catch (e) {
-        console.error("Failed to load knowledge from KV:", e.message);
+        console.error("Failed to load knowledge:", e.message);
     }
 }
 
@@ -267,21 +292,14 @@ app.post('/api/login', (req, res) => {
 
 // Health & Status Endpoint
 app.get('/api/status', async (req, res) => {
-    // Check if KV is actually initialized, not just if variables exist
-    const isKvReady = !!kv;
-    const hasVariables = !!(
-        process.env.KV_REST_API_URL || 
-        process.env.UPSTASH_REDIS_REST_URL || 
-        process.env.REDIS_URL
-    );
-
     res.json({
         manual_active: globalKnowledgeBase.length > 0,
         manual_size: globalKnowledgeBase.length,
         routing_map: routingMap,
         using_kv: true,
-        kv_configured: isKvReady,
-        error: !isKvReady && hasVariables ? "URL de base de datos no compatible (debe empezar con https://)" : null
+        kv_configured: dbType !== "none" && dbType !== "error",
+        db_type: dbType,
+        error: dbType === "error" ? "Error de conexión a la base de datos" : null
     });
 });
  
@@ -296,8 +314,10 @@ app.use((err, req, res, next) => {
 });
 
 // Load knowledge on startup
-loadKnowledge().then(() => {
-    console.log("Server ready with loaded knowledge.");
+initDb().then(() => {
+    loadKnowledge().then(() => {
+        console.log("Server ready with loaded knowledge.");
+    });
 });
 
 module.exports = app;
